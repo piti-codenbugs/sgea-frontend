@@ -38,7 +38,6 @@
                 color="primary"
                 rounded="xl"
                 size="x-large"
-                to="/"
               >Ingresar</v-btn>
             </v-col>
           </v-row>
