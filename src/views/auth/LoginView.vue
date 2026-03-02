@@ -17,7 +17,16 @@ async function handleLogin() {
   error.value = ''
   try {
     await auth.login(email.value, password.value)
-    router.push('/dashboard')
+
+    // redireccion por rol
+    if (auth.userRole === 'STUDENT') {
+      router.push('/student/dashboard')
+    } else if (auth.userRole === 'PROFESSOR') {
+      router.push('/professor/dashboard')
+    } else {
+      router.push('/')
+    }
+
   } catch (e: any) {
     error.value = e.response?.data?.message || 'Credenciales incorrectas'
   } finally {
