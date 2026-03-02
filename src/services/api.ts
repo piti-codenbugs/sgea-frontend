@@ -1,30 +1,34 @@
 import axios from 'axios'
+import router from '@/router'
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
-    headers: {'Content-Type': 'application/json'}
+    headers: {
+        'Content-Type': 'application/json'
+    }
 })
+console.log('API URL:', import.meta.env.VITE_API_URL)
 
-//agregando token a cada request
+// interceptor de request -> agrega JWT
 api.interceptors.request.use((config) => {
-    //obteniendo token del localStorage
     const token = localStorage.getItem('token')
-    //si hay token se agrega a config
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
-    //retornando connfig
+
     return config
 })
 
-// si el token expira redirige al login
+// Interceptor de response -> maneja token expirado
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('token')
-            window.location.href = '/login'
+            router.push('/login')
         }
+
         return Promise.reject(error)
     }
 )
