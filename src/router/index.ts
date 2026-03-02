@@ -1,15 +1,26 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import WelcomeView from '../views/WelcomeView.vue'
+import {useAuthStore} from "@/stores/authStore.ts";
 
 const routes = [
-  { path: '/', component: WelcomeView },
-  { path: '/login', component: LoginView },
-  { path: '/register', component: RegisterView },
+    {path: '/', component: WelcomeView},
+    {path: '/login', component: LoginView},
+    {path: '/register', component: RegisterView},
 ]
 
 export const router = createRouter({
-  history: createWebHistory(),
-  routes,
+    history: createWebHistory(),
+    routes,
 })
+
+// bloqueando rutas protegidas si no hay token
+router.beforeEach((to) => {
+    const auth = useAuthStore()
+    if (to.meta.requiresAuth && !auth.isAuthenticated) {
+        return '/login'
+    }
+})
+
+export default router
