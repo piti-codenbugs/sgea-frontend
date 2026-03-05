@@ -37,28 +37,33 @@ async function handleLogin() {
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
     <v-card width="400">
-      <v-card-title class="text-center">Inicio de Sesion</v-card-title>
+      <v-card-title class="text-center">
+        Inicio de Sesion
+      </v-card-title>
       <v-card-text>
-        <!-- alerta de error -->
+        <!-- error -->
         <v-alert
             v-if="error"
             type="error"
             variant="tonal"
             class="mb-4"
-        >{{ error }}
+        >
+          {{ error }}
         </v-alert>
-
+        <!-- email -->
         <v-text-field
             v-model="email"
             label="Correo"
             type="email"
+            data-cy="email"
         />
         <v-text-field
             v-model="password"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             label="Contraseña"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :type="showPassword ? 'text' : 'password'"
             @click:append="showPassword = !showPassword"
+            data-cy="password"
         />
       </v-card-text>
       <v-card-actions>
@@ -71,7 +76,9 @@ async function handleLogin() {
                   rounded="xl"
                   size="x-large"
                   to="/"
-              >Regresar
+                  data-cy="btn-back"
+              >
+                Regresar
               </v-btn>
             </v-col>
             <v-col cols="12" md="4" sm="6">
@@ -82,7 +89,9 @@ async function handleLogin() {
                   size="x-large"
                   :loading="loading"
                   @click="handleLogin"
-              >Ingresar
+                  data-cy="login-btn"
+              >
+                Ingresar
               </v-btn>
             </v-col>
           </v-row>
@@ -94,7 +103,8 @@ async function handleLogin() {
                   rounded="xl"
                   size="large"
                   to="/register"
-              >¿Sin cuenta aun? Registrate
+              >
+                ¿Sin cuenta aun? Registrate
               </v-btn>
             </v-col>
           </v-row>

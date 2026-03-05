@@ -40,7 +40,7 @@ async function handleRegister() {
       }
       await registerStudent(payload)
 
-    } else if(selectedRole.value === 'Profesor') {
+    } else if (selectedRole.value === 'Profesor') {
       //si es profesor se crea dto con los datos recibidos
       const payload: RegisterProfessorRequestDto = {
         firstName: firstName.value,
@@ -74,6 +74,7 @@ async function handleRegister() {
             v-model="selectedRole"
             :items="['Estudiante', 'Profesor']"
             label="Seleccione un rol"
+            data-cy="selectedRole"
         />
         <v-text-field v-model="firstName" label="Nombres"/>
         <v-text-field v-model="lastName" label="Apellidos"/>
@@ -82,6 +83,7 @@ async function handleRegister() {
             v-if="selectedRole === 'Estudiante'"
             v-model="carnet"
             label="Carnet"
+            data-cy="carnet"
         />
         <v-text-field
             v-model="password"
@@ -108,6 +110,7 @@ async function handleRegister() {
                   size="x-large"
                   :loading="loading"
                   @click="handleRegister"
+                  data-cy="login-btn"
               >Registrarse
               </v-btn>
             </v-col>
