@@ -87,20 +87,21 @@ async function handleRegister() {
                       variant="outlined" prepend-inner-icon="mdi-account" class="mb-3" data-cy="selectedRole"/>
 
             <v-text-field v-model="firstName" label="Nombres" variant="outlined" prepend-inner-icon="mdi-account"
-                          class="mb-3"/>
+                          class="mb-3" data-cy="firstName"/>
 
             <v-text-field v-model="lastName" label="Apellidos" variant="outlined"
-                          prepend-inner-icon="mdi-account-outline" class="mb-3"/>
+                          prepend-inner-icon="mdi-account-outline" class="mb-3" data-cy="lastName"/>
 
             <v-text-field v-model="email" label="Correo" type="email" variant="outlined" prepend-inner-icon="mdi-email"
-                          class="mb-3"/>
+                          class="mb-3" data-cy="email"/>
 
             <v-text-field v-if="selectedRole === 'Estudiante'" v-model="carnet" label="Carnet" variant="outlined"
                           prepend-inner-icon="mdi-card-account-details" class="mb-3" data-cy="carnet"/>
 
             <v-text-field v-model="password" label="Contraseña" variant="outlined" prepend-inner-icon="mdi-lock"
                           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                          :type="showPassword ? 'text' : 'password'" @click:append="showPassword = !showPassword"/>
+                          :type="showPassword ? 'text' : 'password'" @click:append="showPassword = !showPassword"
+                          data-cy="password"/>
 
           </v-card-text>
 
