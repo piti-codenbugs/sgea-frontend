@@ -1,6 +1,6 @@
 export enum UserRole {
-    STUDENT = 'STUDENT',
-    PROFESSOR = 'PROFESSOR',
+    STUDENT = 'ROLE_STUDENT',
+    PROFESSOR = 'ROLE_PROFESSOR',
 }
 
 export interface LoginRequestDto {
