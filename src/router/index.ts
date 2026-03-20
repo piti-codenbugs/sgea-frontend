@@ -7,7 +7,6 @@ import ProfessorDashboardView from '../views/professor/ProfessorDashboardView.vu
 import { useAuthStore } from '@/stores/authStore.ts'
 import RequestListView from '../views/admin/requests/RequestListView.vue'
 import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
-import path from 'path'
 
 const routes = [
     { path: '/', component: WelcomeView },
@@ -40,7 +39,7 @@ const routes = [
             },
             {
                 path: 'requests',
-                name: 'admin-requests',
+                name: 'professor-requests',
                 component: () => import('@/views/admin/requests/RequestListView.vue'),
                 meta: { title: 'Docentes Pendientes' }
             }
