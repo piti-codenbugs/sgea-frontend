@@ -1,83 +1,78 @@
 <script setup lang="ts">
-import {useAuthStore} from '@/stores/authStore'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
+const router = useRouter()
 const auth = useAuthStore()
 
-const icons = [
-  'mdi-github',
-  'mdi-gmail'
+const navLinks = [
+  { title: 'Mis Cursos', icon: 'mdi-book-open-variant', to: { name: 'professor-courses' } },
 ]
+
+const handleLogout = () => {
+  auth.logout()
+  router.push('/login')
+}
 </script>
+
 <template>
   <v-app>
-    <v-main class="bg-background">
-      <v-container class="fill-height d-flex align-center justify-center">
-        <v-card class="text-center pa-6 elevation-10 rounded-xl" width="520">
+    <v-app-bar color="primary" elevation="3">
+      <v-app-bar-title class="font-weight-bold">
+        SGEA <span class="text-subtitle-2 font-weight-thin d-none d-sm-inline">| Docente</span>
+      </v-app-bar-title>
 
-          <v-icon size="56" color="primary" class="mb-3">
-            mdi-account
-          </v-icon>
+      <v-spacer></v-spacer>
 
-          <v-card-title class="text-h4 font-weight-bold">Bienvenido, {{ auth.user?.name }}</v-card-title>
+      <div class="d-none d-md-flex">
+        <v-btn v-for="link in navLinks" :key="link.title" :to="link.to" variant="text" class="mx-1">
+          <v-icon start :icon="link.icon"></v-icon>
+          {{ link.title }}
+        </v-btn>
+      </div>
 
-          <v-card-text class="text-h6 mt-2 text-secondary">Profesor</v-card-text>
+      <v-divider vertical inset class="mx-4 d-none d-md-flex"></v-divider>
 
-          <v-divider class="my-4"></v-divider>
+      <v-menu min-width="230px" rounded="lg">
+        <template v-slot:activator="{ props }">
+          <v-btn icon v-bind="props">
+            <v-avatar color="secondary" size="32">
+              <span v-if="auth.user?.name" class="text-caption">{{ auth.user.name.charAt(0).toUpperCase()
+              }}</span>
+              <v-icon v-else icon="mdi-account" size="small"></v-icon>
+            </v-avatar>
+          </v-btn>
+        </template>
 
-          <v-card-actions class="justify-center">
+        <v-list>
+          <v-list-item class="pb-3">
+            <template v-slot:prepend>
+              <v-avatar color="primary" size="40">
+                <span class="text-h6 text-white">{{ auth.user?.name?.charAt(0).toUpperCase() }}
+                </span>
+              </v-avatar>
+            </template>
+            <v-list-item-title class="font-weight-bold">{{ auth.user?.name }}</v-list-item-title>
+            <v-list-item-subtitle class="text-caption">Administrador de Sistema</v-list-item-subtitle>
+          </v-list-item>
 
-            <v-btn
-                color="error"
-                size="large"
-                rounded="xl"
-                prepend-icon="mdi-logout"
-                @click="auth.logout(); $router.push('/login')"
-            >
-              Cerrar Sesión
-            </v-btn>
+          <v-divider></v-divider>
 
-          </v-card-actions>
+          <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi perfil"
+            to="/professor/profile"></v-list-item>
 
-        </v-card>
+          <v-divider class="my-2"></v-divider>
 
+          <v-list-item prepend-icon="mdi-logout" title="Cerrar sesión" color="error"
+            @click="handleLogout"></v-list-item>
+        </v-list>
+      </v-menu>
+    </v-app-bar>
+
+    <v-main class="bg-grey-lighten-4">
+      <v-container fluid class="pa-4 pa-md-6">
+        <router-view />
       </v-container>
-
     </v-main>
-
-    <v-footer
-        class="text-center d-flex flex-column ga-1 py-2"
-        color="primary"
-        app
-    >
-
-      <div class="d-flex ga-2 justify-center">
-        <v-btn
-            v-for="icon in icons"
-            :key="icon"
-            :icon="icon"
-            color="accent"
-            density="compact"
-            size="small"
-            variant="text"
-        />
-      </div>
-
-      <v-divider
-          color="secondary"
-          class="my-1"
-          thickness="1"
-          width="120"
-      />
-
-      <div class="text-caption text-background">
-        <strong>SGEA. PITI - CodeNBugs</strong>
-      </div>
-
-    </v-footer>
-
   </v-app>
-
 </template>
-
-<style scoped>
-</style>

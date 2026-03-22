@@ -1,0 +1,77 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { professorService } from '@/services/professor/professorService'
+import type { CourseDto } from '@/dtos/course.dto'
+import type { VDataTable } from 'vuetify/components'
+
+type Headers = VDataTable['$props']['headers']
+
+const myCourses = ref<CourseDto[]>([])
+const loading = ref(false)
+// 1. Nueva variable reactiva para la búsqueda
+const searchQuery = ref('')
+
+const headers: Headers = [
+    { title: 'Código', key: 'code', align: 'start', sortable: true },
+    { title: 'Nombre del Curso', key: 'name', align: 'start' },
+    { title: 'Semestre', key: 'semester', align: 'center' },
+    { title: 'Pensum', key: 'curriculum', align: 'start' },
+    { title: 'Acciones', key: 'actions', sortable: false, align: 'center' },
+]
+
+const loadCourses = async () => {
+    loading.value = true
+    try {
+        myCourses.value = await professorService.getMyCourses()
+    } catch (error) {
+        console.error("Error al cargar mis cursos:", error)
+    } finally {
+        loading.value = false
+    }
+}
+
+onMounted(loadCourses)
+</script>
+
+<template>
+    <div>
+        <div class="d-flex align-center mb-6">
+            <h1 class="text-h4 font-weight-bold text-primary">Mis Cursos Asignados</h1>
+            <v-spacer></v-spacer>
+            <v-btn icon="mdi-refresh" @click="loadCourses" :loading="loading" color="primary" variant="tonal"></v-btn>
+        </div>
+
+        <v-text-field
+            v-model="searchQuery"
+            prepend-inner-icon="mdi-magnify"
+            label="Buscar por nombre o código de curso..."
+            variant="outlined"
+            rounded="lg"
+            class="mb-6 bg-white"
+            hide-details
+            clearable
+        ></v-text-field>
+
+        <v-card border flat rounded="lg">
+            <v-data-table 
+                :headers="headers" 
+                :items="myCourses" 
+                :search="searchQuery"
+                :loading="loading" 
+                hover
+                no-data-text="No tienes cursos asignados actualmente"
+            >
+                <template v-slot:item.semester="{ item }">
+                    {{ item.semester }}° Semestre
+                </template>
+
+                <template v-slot:item.actions="{ item }">
+                    <v-btn prepend-icon="mdi-eye" color="secondary" variant="text" size="small"
+                        :to="{ name: 'course-details', params: { code: item.code } }">
+                        Ver Detalles
+                    </v-btn>
+                </template>
+            </v-data-table>
+        </v-card>
+    </div>
+</template>
