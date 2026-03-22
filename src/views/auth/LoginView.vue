@@ -22,10 +22,10 @@ async function handleLogin() {
     await auth.login(email.value, password.value)
 
     // redireccion por rol
-    if (auth.userRole === 'STUDENT') {
+    if (auth.userRole === 'ROLE_STUDENT') {
       router.push('/student/dashboard')
-    } else if (auth.userRole === 'PROFESSOR') {
-      router.push('/professor/dashboard')
+    } else if (auth.userRole === 'ROLE_PROFESSOR') {
+      router.push('/professor/my-courses')
     } else if (auth.userRole === 'ROLE_ADMIN') {
       router.push('/admin/courses')
     } else {

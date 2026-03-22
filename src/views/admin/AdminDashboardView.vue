@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore';
 
@@ -39,12 +38,30 @@ const handleLogout = () => {
                 <template v-slot:activator="{ props }">
                     <v-btn icon v-bind="props">
                         <v-avatar color="secondary" size="32">
-                            <v-icon icon="mdi-account" size="small"></v-icon>
+                            <span v-if="auth.user?.name" class="text-caption">{{ auth.user.name.charAt(0).toUpperCase()
+                            }}</span>
+                            <v-icon v-else icon="mdi-account" size="small"></v-icon>
                         </v-avatar>
                     </v-btn>
                 </template>
 
                 <v-list>
+                    <v-menu min-width="230px" rounded="lg">
+                        <template v-slot:activator="{ props }">
+                            <v-btn icon v-bind="props">
+                                <v-avatar color="secondary" size="32">
+                                    <span v-if="auth.user?.name" class="text-caption text-white">
+                                        {{ auth.user.name.charAt(0).toUpperCase() }}
+                                    </span>
+                                    <v-icon v-else icon="mdi-account" size="small"></v-icon>
+                                </v-avatar>
+                            </v-btn>
+                        </template>
+
+                    </v-menu>
+
+                    <v-divider></v-divider>
+
                     <div class="d-flex d-md-none flex-column">
                         <v-list-item v-for="link in navLinks" :key="'mobile-' + link.title" :to="link.to"
                             :prepend-icon="link.icon" :title="link.title" color="primary" class="mb-1"></v-list-item>

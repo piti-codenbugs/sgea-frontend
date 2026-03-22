@@ -26,9 +26,16 @@ const routes = [
         meta: { requiresAuth: true, role: 'STUDENT' }
     },
     {
-        path: '/professor/dashboard',
-        component: ProfessorDashboardView,
-        meta: { requiresAuth: true, role: 'PROFESSOR' }
+        path: '/professor',
+        component: () => import('@/views/professor/ProfessorDashboardView.vue'),
+        children: [
+            {
+                path: 'my-courses',
+                name: 'professor-courses',
+                component: () => import('@/views/professor/ProfessorCoursesView.vue')
+            }
+        ],
+        meta: { requiresAuth: true, role: 'ROLE_PROFESSOR' }
     },
     {
         path: '/admin',
