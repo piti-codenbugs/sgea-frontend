@@ -1,24 +1,23 @@
 export interface CourseDto {
-    id: number;
-    code: string;
+    code: number;
     name: string;
+    careerId: number;
+    careerName: string;
     semester: string;
     curriculum: string;
     professorId: number | null;
-    professorName?: string;
+    professorName: string | null;
 }
 
 export interface CreateCourseRequestDto {
-    code: string;
+    code: number;
     name: string;
-    semester: string;
-    curriculum: string;
+    careerId: number;
 }
 
 export interface UpdateCourseRequestDto {
-    code?: string;
+    code?: number;
     name?: string;
-    semester?: string;
-    curriculum?: string;
+    careerId?: number;
     professorId?: number | null;
 }

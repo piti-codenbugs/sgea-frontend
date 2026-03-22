@@ -1,145 +1,112 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { adminService } from '@/services/admin/adminService'
 import type { CourseDto } from '@/dtos/course.dto'
 import type { ProfessorDto } from '@/dtos/professor.dto'
+import { VDataTable } from 'vuetify/components'
 
-// --- ESTADOS ---
+type ReadonlyDataTableHeader = VDataTable['$props']['headers']
 const courses = ref<CourseDto[]>([])
 const teachers = ref<ProfessorDto[]>([])
 const loading = ref(false)
-const search = ref('')
+const searchQuery = ref('')
 
 const editDialog = ref(false)
 const selectedCourse = ref<CourseDto | null>(null)
 
-// --- MÉTODOS ---
-const loadData = async () => {
-    loading.value = true
-    try {
-        // Obtenemos cursos y profesores aprobados para asignar
-        const [coursesData, professorsData] = await Promise.all([
-            adminService.getCourses(),
-            adminService.getProfessorRequests() 
-        ])
-        courses.value = coursesData
-        // Filtramos para mostrar solo los aprobados en el selector, si fuera necesario
-        teachers.value = professorsData 
-    } catch (error) {
-        console.error("Error al cargar los datos:", error)
-    } finally {
-        loading.value = false
-    }
-}
-
-const headers = [
-    { title: 'Código', key: 'code' },
-    { title: 'Nombre del curso', key: 'name' },
-    { title: 'Semestre', key: 'semester' },
-    { title: 'Pensum', key: 'curriculum' },
-    { title: 'Docente asignado', key: 'professorId', sortable: false },
-    { title: 'Acciones', key: 'actions', sortable: false },
+const headers: ReadonlyDataTableHeader = [
+  { title: 'Código', key: 'code', align: 'start', sortable: true },
+  { title: 'Nombre del Curso', key: 'name', align: 'start' },
+  { title: 'Semestre', key: 'semester', align: 'center' },
+  { title: 'Docente Asignado', key: 'professorId', sortable: false, width: '250px' },
+  { title: 'Acciones', key: 'actions', sortable: false, align: 'center' },
 ]
 
-const openEdit = (item: CourseDto) => {
-    selectedCourse.value = { ...item }
-    editDialog.value = true
+const loadData = async () => {
+  loading.value = true
+  try {
+    const [coursesResult, profsResult] = await Promise.allSettled([
+      adminService.getCourses(),
+      adminService.getProfessorRequests()
+    ])
+    if (coursesResult.status === 'fulfilled') courses.value = coursesResult.value || []
+    if (profsResult.status === 'fulfilled') teachers.value = profsResult.value || []
+  } finally {
+    loading.value = false
+  }
+}
+
+const openEdit = (course: CourseDto) => {
+  selectedCourse.value = { ...course }
+  editDialog.value = true
 }
 
 const saveEdit = async () => {
-    if (selectedCourse.value) {
-        try {
-            await adminService.updateCourse(selectedCourse.value.id, selectedCourse.value)
-            await loadData()
-            editDialog.value = false
-        } catch (e) { 
-            alert("Error al guardar los cambios") 
-        }
-    }
+  if (!selectedCourse.value) return
+  try {
+    await adminService.updateCourse(selectedCourse.value.code, selectedCourse.value)
+    const index = courses.value.findIndex(c => c.code === selectedCourse.value?.code)
+    if (index !== -1) courses.value[index] = { ...selectedCourse.value }
+    editDialog.value = false
+  } catch (e) {
+    alert("Error al guardar cambios")
+  }
 }
 
 const assignTeacher = async (course: CourseDto) => {
-    try {
-        await adminService.updateCourse(course.id, { professorId: course.professorId })
-        console.log(`Profesor ${course.professorId} asignado con éxito`)
-    } catch (e) { 
-        alert("Error en la asignación") 
-    }
+  try {
+    await adminService.updateCourse(course.code, { professorId: course.professorId })
+  } catch (e) { alert("Error en la asignación") }
 }
 
 onMounted(loadData)
 </script>
 
 <template>
-  <v-container>
-    <v-card rounded="lg" elevation="2">
-      <v-card-title class="pa-4 d-flex align-center">
-        <v-icon start color="primary">mdi-book-cog</v-icon>
-        Gestión de Cursos
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          prepend-inner-icon="mdi-magnify"
-          label="Buscar curso..."
-          variant="outlined"
-          density="compact"
-          hide-details
-          style="max-width: 300px;"
-        ></v-text-field>
-      </v-card-title>
+  <v-container fluid class="pa-4 pa-md-8">
+    <div class="d-flex align-center mb-6">
+      <h1 class="text-h4 font-weight-bold text-primary">Gestión de Cursos</h1>
+      <v-spacer></v-spacer>
+      <v-btn icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
+    </div>
 
-      <v-data-table
-        :headers="headers"
-        :items="courses"
-        :search="search"
-        :loading="loading"
-        hover
-        no-data-text="No hay cursos disponibles"
-        loading-text="Cargando información..."
-      >
-        <template #[`item.professorId`]="{ item }">
-          <v-select
-            v-model="(item as any).professorId"
-            :items="teachers"
-            :item-title="(prof: ProfessorDto) => `${prof.firstName} ${prof.lastName}`"
-            item-value="id"
-            label="Asignar Docente"
-            variant="underlined"
-            density="compact"
-            hide-details
-            @update:model-value="assignTeacher(item)"
-          ></v-select>
+    <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar por nombre o código..."
+      variant="outlined" rounded="lg" class="mb-6 bg-white" hide-details clearable></v-text-field>
+
+    <v-card border flat rounded="lg">
+      <v-data-table :headers="headers" :items="courses" :search="searchQuery" :loading="loading"
+        loading-text="Cargando información..." no-data-text="No hay cursos registrados"
+        items-per-page-text="Filas por página" :items-per-page-options="[5, 10, 20, 50]" hover>
+        <template v-slot:item.semester="{ item }">
+          {{ item.semester }}° Semestre
         </template>
 
-        <template #[`item.actions`]="{ item }">
-          <v-btn 
-            icon="mdi-pencil" 
-            variant="text" 
-            color="primary" 
-            title="Editar curso"
-            @click="openEdit(item)"
-          ></v-btn>
+        <template v-slot:item.professorId="{ item }">
+          <v-select v-model="item.professorId" :items="teachers"
+            :item-title="(p: ProfessorDto) => `${p.firstName} ${p.lastName}`" item-value="id" label="Asignar..."
+            variant="underlined" density="compact" hide-details @update:model-value="assignTeacher(item)"></v-select>
+        </template>
+
+        <template v-slot:item.actions="{ item }">
+          <v-btn icon="mdi-pencil" color="primary" variant="text" density="comfortable" @click="openEdit(item)"></v-btn>
+        </template>
+
+        <template v-slot:loader>
+          <v-progress-linear indeterminate color="primary" height="2"></v-progress-linear>
         </template>
       </v-data-table>
     </v-card>
 
-    <v-dialog v-model="editDialog" max-width="600px">
-      <v-card title="Editar Información del Curso" rounded="xl" class="pa-4">
+    <v-dialog v-model="editDialog" max-width="500">
+      <v-card rounded="xl" class="pa-4">
+        <v-card-title class="text-h5">Editar Curso</v-card-title>
         <v-card-text v-if="selectedCourse">
-          <v-row>
-            <v-col cols="6">
-              <v-text-field v-model="selectedCourse.code" label="Código" variant="outlined"></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="selectedCourse.semester" label="Semestre" variant="outlined"></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="selectedCourse.name" label="Nombre del Curso" variant="outlined"></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="selectedCourse.curriculum" label="Pensum / Malla Curricular" variant="outlined"></v-text-field>
-            </v-col>
-          </v-row>
+          <v-text-field v-model="selectedCourse.code" label="Código" variant="outlined" readonly
+            class="mb-2"></v-text-field>
+          <v-text-field v-model="selectedCourse.name" label="Nombre" variant="outlined" class="mb-2"></v-text-field>
+          <v-text-field v-model="selectedCourse.semester" label="Semestre" variant="outlined" type="number"
+            class="mb-2"></v-text-field>
+          <v-text-field v-model="selectedCourse.curriculum" label="Pensum" variant="outlined"></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

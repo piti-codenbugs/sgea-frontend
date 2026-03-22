@@ -15,7 +15,7 @@ const loading = ref(false)
 const icons = ['mdi-github', 'mdi-gmail']
 
 async function handleLogin() {
-  /*loading.value = true
+  loading.value = true
   error.value = ''
 
   try {
@@ -26,7 +26,7 @@ async function handleLogin() {
       router.push('/student/dashboard')
     } else if (auth.userRole === 'PROFESSOR') {
       router.push('/professor/dashboard')
-    } else if (auth.userRole === 'ADMINISTRADOR') {
+    } else if (auth.userRole === 'ROLE_ADMIN') {
       router.push('/admin/courses')
     } else {
       router.push('/')
@@ -34,28 +34,6 @@ async function handleLogin() {
 
   } catch (e: any) {
     error.value = e.response?.data?.message || 'Credenciales incorrectas'
-  } finally {
-    loading.value = false
-  }*/
-
-  loading.value = true
-  error.value = ''
-
-  try {
-    // --- SIMULACIÓN DE BACKEND ---
-    // Inyectamos datos directamente al store
-    auth.user = { name: 'Admin de Pruebas', email: email.value }
-    auth.userRole = 'ADMIN' // Asegúrate que en el Router diga 'ADMIN'
-    auth.isAuthenticated = true
-    
-    console.log('Login simulado con éxito');
-    
-    // Redirección forzada
-    router.push('/admin/courses')
-    // ----------------------------
-
-  } catch (e: any) {
-    error.value = 'Error en la simulación'
   } finally {
     loading.value = false
   }

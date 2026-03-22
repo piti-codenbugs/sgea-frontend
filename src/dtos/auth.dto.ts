@@ -1,6 +1,7 @@
 export enum UserRole {
     STUDENT = 'STUDENT',
     PROFESSOR = 'PROFESSOR',
+    ADMIN = 'ROLE_ADMIN'
 }
 
 export interface LoginRequestDto {

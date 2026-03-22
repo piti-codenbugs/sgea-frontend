@@ -4,14 +4,14 @@ export interface ProfessorDto {
     id: number
     firstName: string
     lastName: string
-    fullName?: string
     email: string
-    role: UserRole.PROFESSOR
-    status: 'PENDING' | 'APPROVED' | 'REJECTED'
-    createdAt: string
-
+    registrationDate: string
+    status?: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'
+    reason?: string
+    role?: UserRole.PROFESSOR
+    fullName?: string
+    createdAt?: string
 }
-
 
 export interface UpdateProfessorRequestDto {
     firstName?: string
