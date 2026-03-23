@@ -2,17 +2,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { adminService } from '@/services/admin/adminService'
 
-// --- ESTADO ---
 const professors = ref<any[]>([])
 const allCourses = ref<any[]>([]) 
 const loading = ref(false)
-const searchQuery = ref('') // Filtro para tabla principal
+const searchQuery = ref('')
 const expanded = ref([])
 
-// --- ESTADO DEL DIÁLOGO ---
 const isAssignDialogOpen = ref(false)
 const selectedProfessor = ref<any>(null)
-const courseSearchQuery = ref('') // Filtro para tabla del diálogo
+const courseSearchQuery = ref('')
 const dialogLoading = ref(false)
 const actionLoading = ref<number | null>(null) 
 
@@ -29,11 +27,9 @@ const courseHeaders = [
     { title: 'Acción', key: 'action', align: 'end', sortable: false },
 ]
 
-// --- CARGA DE DATOS ---
 const fetchAssignments = async () => {
     loading.value = true
     try {
-        // NOTA: Cuando tu endpoint esté listo, cambia esto por adminService.getProfessorAssignments()
         const mockProfessors = [
             { id: 1, firstName: 'Oscar', lastName: 'García', email: 'oscar.garcia@univ.edu', courses: [{ id: 101, name: 'Base de Datos I', code: 'BD1' }] },
             { id: 2, firstName: 'Ana', lastName: 'Martínez', email: 'ana.mtz@univ.edu', courses: [] },
@@ -63,10 +59,9 @@ const fetchAllCourses = async () => {
     }
 }
 
-// --- LÓGICA DE ASIGNACIÓN ---
 const openAssignDialog = (professor: any) => {
     selectedProfessor.value = professor
-    courseSearchQuery.value = '' // Limpiar búsqueda al abrir
+    courseSearchQuery.value = ''
     isAssignDialogOpen.value = true
     fetchAllCourses()
 }
@@ -80,17 +75,14 @@ const handleToggleCourse = async (course: any) => {
     try {
         if (isAssigned(course.id)) {
             console.log("Quitando curso:", course.name, "al profesor:", selectedProfessor.value.id)
-            // Lógica de desasignación aquí
         } else {
             console.log("Asignando curso:", course.name, "al profesor:", selectedProfessor.value.id)
-            // Lógica de asignación aquí
         }
     } finally {
         actionLoading.value = null
     }
 }
 
-// --- FILTROS REACTIVOS ---
 const filteredProfessors = computed(() => {
     const s = searchQuery.value.toLowerCase().trim()
     if (!s) return professors.value
@@ -99,15 +91,6 @@ const filteredProfessors = computed(() => {
         p.email.toLowerCase().includes(s)
     )
 })
-/*
-const filteredCourses = computed(() => {
-    const s = courseSearchQuery.value.toLowerCase().trim()
-    if (!s) return allCourses.value
-    return allCourses.value.filter(c =>
-        c.name.toLowerCase().includes(s) || 
-        c.code?.toLowerCase().includes(s)
-    )
-})*/
 
 onMounted(fetchAssignments)
 </script>
