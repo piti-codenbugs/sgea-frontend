@@ -210,7 +210,7 @@ onMounted(fetchRequests)
         <v-card-title class="text-h6 font-weight-bold">Rechazar Solicitud</v-card-title>
         <v-card-text>
           <p class="mb-4">¿Rechazar a <b>{{ selectedRequest?.fullName }}</b>?</p>
-          <v-textarea v-model="rejectReason" label="Motivo del rechazo" variant="outlined" rows="3" color="error"
+          <v-textarea data-cy="reject-reason" v-model="rejectReason" label="Motivo del rechazo" variant="outlined" rows="3" color="error"
             auto-grow prepend-inner-icon="mdi-comment-text-outline"></v-textarea>
         </v-card-text>
         <v-card-actions>
