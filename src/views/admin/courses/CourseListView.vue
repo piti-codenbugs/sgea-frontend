@@ -112,31 +112,31 @@ onMounted(loadData)
     <div class="d-flex align-center mb-6">
       <h1 class="text-h4 font-weight-bold text-primary">Gestión de Cursos</h1>
       <v-spacer></v-spacer>
-      <v-btn icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
+      <v-btn data-cy="refresh-btn" icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
     </div>
 
-    <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar curso..." variant="outlined"
+    <v-text-field data-cy="search-input" v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar curso..." variant="outlined"
       rounded="lg" class="mb-6 bg-white" hide-details clearable></v-text-field>
 
     <v-card border flat rounded="lg">
-      <v-data-table :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
+      <v-data-table data-cy="courses-table" :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
 
         <template v-slot:item.semester="{ item }">
-          {{ item.semester }}° Semestre
+          <span data-cy="course-semester">{{ item.semester }}° Semestre</span>
         </template>
 
         <template v-slot:item.professorName="{ item }">
           <div class="d-flex align-center">
-            <span :class="!item.professorId ? 'text-grey italic' : ''">
+            <span data-cy="course-professor" :class="!item.professorId ? 'text-grey italic' : ''">
               {{ getProfessorName(item.professorId) }}
             </span>
-            <v-btn icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
+            <v-btn data-cy="assign-teacher-btn" icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
               @click="openTeacherPicker(item)"></v-btn>
           </div>
         </template>
 
         <template v-slot:item.actions="{ item }">
-          <v-btn icon="mdi-pencil" color="primary" variant="text" @click="openEdit(item)"></v-btn>
+          <v-btn data-cy="edit-btn" icon="mdi-pencil" color="primary" variant="text" @click="openEdit(item)"></v-btn>
         </template>
       </v-data-table>
     </v-card>
