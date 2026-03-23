@@ -1,16 +1,15 @@
 import { UserRole } from './auth.dto'
 
 export interface ProfessorDto {
-    id: number
-    firstName: string
-    lastName: string
-    email: string
-    registrationDate: string
-    status?: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'
-    reason?: string
-    role?: UserRole.PROFESSOR
-    fullName?: string
-    createdAt?: string
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    registrationDate: string;
+    status?: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+    rejectionReason?: string;
+    fullName?: string;
+    password?: string;
 }
 
 export interface UpdateProfessorRequestDto {

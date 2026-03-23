@@ -11,30 +11,30 @@ export const adminService = {
             api.get<ProfessorDto[]>('/professor', { params: { status: 'RECHAZADO' } })
         ]);
 
-        console.log("Datos cargados:", { 
-            pendientes: pendingRes.data, 
-            aprobados: approvedRes.data, 
-            rechazados: rejectedRes.data 
+        const pending = (pendingRes.data || []).map(p => ({ ...p, status: 'PENDIENTE' as const }));
+        const approved = (approvedRes.data || []).map(p => ({ ...p, status: 'APROBADO' as const }));
+        const rejected = (rejectedRes.data || []).map(p => ({ ...p, status: 'RECHAZADO' as const }));
+
+        return [...pending, ...approved, ...rejected];
+    },
+
+    async updateAccountStatus(id: number, status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO', rejectionReason?: string): Promise<void> {
+        await api.patch(`/professor/${id}/status`, {
+            status,
+            rejectionReason
         });
-
-        return [
-            ...(pendingRes.data || []),
-            ...(approvedRes.data || []),
-            ...(rejectedRes.data || [])
-        ];
     },
 
-    async updateProfessorStatus(id: number, status: 'APROBADO' | 'PENDIENTE' | 'RECHAZADO'): Promise<void> {
-        await api.patch(`/professor/${id}/status/${status}`);
-    },
-
-    async approveProfessor(id: number): Promise<void> {
-        await api.patch(`/professor/${id}/approve`);
-    },
-
-    async rejectProfessor(id: number): Promise<void> {
-        // pendiente en el backend
-        await api.patch(`/professor/${id}/reject`);
+    async updateProfessorInfo(
+        id: number,
+        data: {
+            firstName: string,
+            lastName: string,
+            email: string,
+            password?: string | null
+        }
+    ): Promise<void> {
+        await api.patch(`/professor/${id}`, data);
     },
 
     // --- Gestión de Cursos ---
