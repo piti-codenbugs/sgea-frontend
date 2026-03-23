@@ -1,11 +1,5 @@
 /// <reference types="cypress" />
 describe('Gestión de Cursos - Administrador', () => {
-
-    Cypress.on('uncaught:exception', (err) => {
-        if (err.message.includes('dynamically imported module')) {
-            return false
-        }
-    })
     // loguearse antes de cada prueba 
     beforeEach(() => {
         cy.visit('/login')
