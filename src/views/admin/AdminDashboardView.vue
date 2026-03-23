@@ -8,7 +8,8 @@ const auth = useAuthStore()
 
 const navLinks = [
     { title: 'Cursos', icon: 'mdi-book-open-variant', to: { name: 'admin-courses' } },
-    { title: 'Solicitudes de profesores', icon: 'mdi-account-clock', to: { name: 'admin-professors' } }
+    { title: 'Solicitudes de profesores', icon: 'mdi-account-clock', to: { name: 'admin-professors' } },
+    { title: 'Profesores - cursos', icon: 'mdi-book', to: { name: 'admin-professors-courses' } }
 ]
 
 const handleLogout = () => {

@@ -37,12 +37,16 @@ export const adminService = {
         await api.patch(`/professor/${id}`, data);
     },
 
+    async getProfessorAssignments() {
+        const response = await api.get('/professor/assignments');
+        return response.data;
+    },
+
     // --- Gestión de Cursos ---
     async getCourses(): Promise<CourseDto[]> {
         const { data } = await api.get<CourseDto[]>('/admin/cursos')
         return data
     },
-
 
     async updateCourse(code: number, payload: UpdateCourseRequestDto): Promise<CourseDto> {
         const { data } = await api.put<CourseDto>(`/admin/cursos/${code}`, payload)
