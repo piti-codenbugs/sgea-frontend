@@ -143,7 +143,7 @@ onMounted(fetchRequests)
       <v-btn icon="mdi-refresh" color="primary" variant="tonal" @click="fetchRequests" :loading="loading"></v-btn>
     </div>
 
-    <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar docente por nombre o correo..."
+    <v-text-field data-cy="search-input" v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar docente por nombre o correo..."
       variant="outlined" rounded="lg" class="mb-6 bg-white" hide-details clearable></v-text-field>
 
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4"></v-progress-linear>
@@ -160,8 +160,8 @@ onMounted(fetchRequests)
               {{ new Date(item.registrationDate).toLocaleDateString() }}
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn color="success" icon="mdi-check-circle" variant="text" @click="approveTeacher(item.id)"></v-btn>
-              <v-btn color="error" icon="mdi-close-circle" variant="text" @click="openRejectDialog(item)"></v-btn>
+              <v-btn data-cy="btn-aprobar" color="success" icon="mdi-check-circle" variant="text" @click="approveTeacher(item.id)"></v-btn>
+              <v-btn data-cy="btn-rechazar" color="error" icon="mdi-close-circle" variant="text" @click="openRejectDialog(item)"></v-btn>
             </template>
           </v-data-table>
         </v-card>

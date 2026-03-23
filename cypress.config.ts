@@ -14,6 +14,9 @@ export default defineConfig({
 
       config.env.PROFESSOR_EMAIL = process.env.CYPRESS_PROFESSOR_EMAIL
       config.env.PROFESSOR_PASSWORD = process.env.CYPRESS_PROFESSOR_PASSWORD
+      
+      config.env.ADMIN_EMAIL = process.env.CYPRESS_ADMIN_EMAIL
+      config.env.ADMIN_PASSWORD = process.env.CYPRESS_ADMIN_PASSWORD
 
       return config
     },
