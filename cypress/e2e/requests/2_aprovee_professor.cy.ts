@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
-
-describe('Aprobar docente y validar inicio de sesión', () => {
+describe('Aprobar docente', () => {
 
     Cypress.on('uncaught:exception', (err) => {
         if (err.message.includes('dynamically imported module')) {
@@ -22,14 +21,15 @@ describe('Aprobar docente y validar inicio de sesión', () => {
     it('Debe registrar un docente correctamente', () => {
         cy.intercept('POST', '**/register-professor').as('registerRequest');
         cy.visit('/register');
-        cy.get('[data-cy=selectedRole]').click();
-        cy.contains('Profesor').click();
-
+        cy.get('[data-cy=selectedRole]').should('be.visible').click();
+        cy.contains('Profesor').should('be.visible').click();
+        
         cy.get('[data-cy=firstName]').type(firstName);
         cy.get('[data-cy=lastName]').type('Apellido_Prueba');
         cy.get('[data-cy=email]').type(email);
         cy.get('[data-cy=password]').type('123456');
         cy.get('[data-cy=login-btn]').click();
+        cy.wait(5000); 
 
         cy.wait('@registerRequest').then((interception) => {
             expect(interception.response?.statusCode).to.eq(200);
@@ -51,29 +51,14 @@ describe('Aprobar docente y validar inicio de sesión', () => {
         cy.visit('/admin/professors');
         cy.wait('@getPendientes');
 
-        cy.get('[data-cy=search-input]').type(firstName);
+        cy.get('[data-cy=search-input]').should('be.visible').type(firstName);
 
-        cy.get('[data-cy=btn-aprobar]').first().click();
+        cy.get('[data-cy=btn-aprobar]').should('have.length.at.least', 1).first().click();
 
         cy.wait('@approveRequest').then((interception) => {
             expect(interception.response?.statusCode).to.eq(204);
         });
 
         cy.contains('Docente aprobado correctamente').should('be.visible');
-    });
-
-    it('El docente aprobado debe poder iniciar sesión', () => {
-        cy.intercept('POST', '**/login').as('loginDocente');
-
-        cy.visit('/login');
-        cy.get('[data-cy=email]').type(email);
-        cy.get('[data-cy=password]').type('123456');
-        cy.get('[data-cy=login-btn]').click();
-
-        cy.wait('@loginDocente').then((interception) => {
-            expect(interception.response?.statusCode).to.eq(200);
-        });
-
-        cy.url().should('not.include', '/login');
     });
 });

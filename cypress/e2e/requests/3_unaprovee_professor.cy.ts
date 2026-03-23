@@ -1,12 +1,9 @@
 /// <reference types="cypress" />
-
 describe('Rechazar docente y validar que no puede iniciar sesión', () => {
-
+    
     Cypress.on('uncaught:exception', (err) => {
-        if (err.message.includes('dynamically imported module')) {
-            return false
-        }
-    })
+        if (err.message.includes('dynamically imported module')) return false;
+    });
 
     let hashId: number;
     let email: string;
@@ -21,8 +18,9 @@ describe('Rechazar docente y validar que no puede iniciar sesión', () => {
     it('Debe registrar un docente correctamente', () => {
         cy.intercept('POST', '**/register-professor').as('registerRequest');
         cy.visit('/register');
-        cy.get('[data-cy=selectedRole]').click();
-        cy.contains('Profesor').click();
+
+        cy.get('[data-cy=selectedRole]').should('be.visible').click();
+        cy.contains('Profesor').should('be.visible').click();
 
         cy.get('[data-cy=firstName]').type(firstName);
         cy.get('[data-cy=lastName]').type('Apellido_Prueba');
@@ -31,7 +29,7 @@ describe('Rechazar docente y validar que no puede iniciar sesión', () => {
         cy.get('[data-cy=login-btn]').click();
 
         cy.wait('@registerRequest').then((interception) => {
-            expect(interception.response?.statusCode).to.eq(200);
+        expect(interception.response?.statusCode).to.eq(200);
         });
     });
 
@@ -41,24 +39,26 @@ describe('Rechazar docente y validar que no puede iniciar sesión', () => {
         cy.intercept('PATCH', '**/professor/**/status').as('rejectRequest');
 
         cy.visit('/login');
-        cy.get('[data-cy=email]').type(Cypress.env('PROFESSOR_EMAIL'));
+        cy.get('[data-cy=email]').should('be.visible').type(Cypress.env('PROFESSOR_EMAIL'));
         cy.get('[data-cy=password]').type(Cypress.env('PROFESSOR_PASSWORD'));
         cy.get('[data-cy=login-btn]').click();
+
         cy.wait('@loginRequest');
 
         cy.visit('/admin/professors');
         cy.wait('@getPendientes');
 
-        cy.get('[data-cy=search-input]').type(firstName);
+        cy.get('[data-cy=search-input]').should('be.visible').type(firstName);
 
-        // Clic en rechazar
-        cy.get('[data-cy=btn-rechazar]').first().click();
+        cy.get('[data-cy=btn-rechazar]').should('have.length.at.least', 1).first().click();
 
-        cy.get('.v-dialog .v-textarea textarea').first().type('Docente no verificado');
-        cy.contains('Confirmar Rechazo').click();
+        cy.get('.v-dialog').should('be.visible');
+        cy.get('.v-dialog .v-textarea textarea').first().should('be.visible').type('Docente no verificado');
+
+        cy.contains('Confirmar Rechazo').should('not.be.disabled').click();
 
         cy.wait('@rejectRequest').then((interception) => {
-            expect(interception.response?.statusCode).to.eq(204);
+        expect(interception.response?.statusCode).to.eq(204);
         });
 
         cy.contains('Solicitud rechazada').should('be.visible');
