@@ -5,8 +5,7 @@ import WelcomeView from '../views/WelcomeView.vue'
 import StudentDashboardView from '../views/student/StudentDashboardView.vue'
 import ProfessorDashboardView from '../views/professor/ProfessorDashboardView.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
-import ProfessorsRequestView from '@/views/admin/requests/ProfessorsRequestView.vue'
-import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
+import { components } from 'vuetify/dist/vuetify.js'
 
 const routes = [
     { path: '/', component: WelcomeView },
@@ -50,6 +49,11 @@ const routes = [
                 path: 'professors',
                 name: 'admin-professors',
                 component: () => import('@/views/admin/requests/ProfessorsRequestView.vue')
+            },
+            {
+                path: 'professors-courses',
+                name: 'admin-professors-courses',
+                component: () => import('@/views/admin/professors-courses/ProfessorCourseView.vue')
             }
         ],
         meta: { requiresAuth: true, role: 'ROLE_ADMIN' }
