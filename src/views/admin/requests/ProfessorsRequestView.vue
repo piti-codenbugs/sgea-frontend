@@ -118,6 +118,7 @@ const saveChanges = async () => {
       firstName: selectedRequest.value.firstName,
       lastName: selectedRequest.value.lastName,
       email: selectedRequest.value.email,
+      password: newPassword.value.trim() !== '' ? newPassword.value : null
     });
 
     isEditInfoDialogOpen.value = false;
@@ -231,7 +232,14 @@ onMounted(fetchRequests)
             class="mb-2"></v-text-field>
           <v-text-field v-model="selectedRequest.email" label="Correo Electrónico" variant="outlined"
             class="mb-4"></v-text-field>
+
           <v-divider class="mb-4"></v-divider>
+
+          <p class="text-subtitle-2 mb-2 text-grey-darken-1">Cambiar Contraseña (opcional)</p>
+          <v-text-field v-model="newPassword" :type="showPassword ? 'text' : 'password'" label="Nueva Contraseña"
+            placeholder="Dejar en blanco para no cambiar" variant="outlined" density="comfortable"
+            prepend-inner-icon="mdi-lock-outline" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="showPassword = !showPassword"></v-text-field>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

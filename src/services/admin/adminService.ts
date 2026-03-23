@@ -25,14 +25,16 @@ export const adminService = {
         });
     },
 
-    async updateProfessorInfo(id: number, data: { firstName: string, lastName: string, email: string }): Promise<void> {
-        const updateDto = {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            password: null
-        };
-        await api.patch(`/professor/${id}`, updateDto);
+    async updateProfessorInfo(
+        id: number,
+        data: {
+            firstName: string,
+            lastName: string,
+            email: string,
+            password?: string | null
+        }
+    ): Promise<void> {
+        await api.patch(`/professor/${id}`, data);
     },
 
     // --- Gestión de Cursos ---

@@ -9,6 +9,7 @@ export interface ProfessorDto {
     status?: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
     rejectionReason?: string;
     fullName?: string;
+    password?: string;
 }
 
 export interface UpdateProfessorRequestDto {
