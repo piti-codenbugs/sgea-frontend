@@ -1,7 +1,7 @@
-import {defineStore} from 'pinia'
-import {ref, computed} from 'vue'
-import type {AuthResponseDto, AuthUserDto, LoginRequestDto} from '@/dtos/auth.dto'
-import {login as loginService} from '@/services/auth/authService'
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import type { AuthResponseDto, AuthUserDto, LoginRequestDto } from '@/dtos/auth.dto'
+import { login as loginService } from '@/services/auth/authService'
 
 // store para la sesion
 export const useAuthStore = defineStore('auth', () => {
@@ -22,15 +22,20 @@ export const useAuthStore = defineStore('auth', () => {
 
     // guardando sesion en memoria y localStorage
     function setSession(data: AuthResponseDto) {
-        token.value = data.token
-        user.value = {name: data.name, email: data.email, role: data.role}
         localStorage.setItem('token', data.token)
-        localStorage.setItem('user', JSON.stringify(user.value))
+        localStorage.setItem('user', JSON.stringify({
+            name: data.name,
+            email: data.email,
+            role: data.role
+        }))
+
+        token.value = data.token
+        user.value = { name: data.name, email: data.email, role: data.role }
     }
 
     // funcion para login
     async function login(email: string, password: string) {
-        const data = await loginService({email, password})
+        const data = await loginService({ email, password })
         setSession(data)
     }
 
@@ -42,5 +47,5 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.removeItem('user')
     }
 
-    return {token, user, isAuthenticated, userRole, login, logout, setSession}
+    return { token, user, isAuthenticated, userRole, login, logout, setSession }
 })

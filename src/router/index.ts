@@ -1,25 +1,59 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import WelcomeView from '../views/WelcomeView.vue'
 import StudentDashboardView from '../views/student/StudentDashboardView.vue'
 import ProfessorDashboardView from '../views/professor/ProfessorDashboardView.vue'
-import {useAuthStore} from '@/stores/authStore.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+import ProfessorsRequestView from '@/views/admin/requests/ProfessorsRequestView.vue'
+import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
 
 const routes = [
-    {path: '/', component: WelcomeView},
-    {path: '/login', component: LoginView},
-    {path: '/register', component: RegisterView},
+    { path: '/', component: WelcomeView },
+    {
+        path: '/login',
+        tittle: 'Iniciar sesion - SGEA',
+        component: LoginView
+    },
+    {
+        path: '/register',
+        title: 'Registrarse - SGEA',
+        component: RegisterView
+    },
     {
         path: '/student/dashboard',
         component: StudentDashboardView,
-        meta: {requiresAuth: true, role: 'STUDENT'}
+        meta: { requiresAuth: true, role: 'STUDENT' }
     },
     {
-        path: '/professor/dashboard',
-        component: ProfessorDashboardView,
-        meta: {requiresAuth: true, role: 'PROFESSOR'}
+        path: '/professor',
+        component: () => import('@/views/professor/ProfessorDashboardView.vue'),
+        children: [
+            {
+                path: 'my-courses',
+                name: 'professor-courses',
+                component: () => import('@/views/professor/ProfessorCoursesView.vue')
+            }
+        ],
+        meta: { requiresAuth: true, role: 'ROLE_PROFESSOR' }
     },
+    {
+        path: '/admin',
+        component: () => import('@/views/admin/AdminDashboardView.vue'),
+        children: [
+            {
+                path: 'courses',
+                name: 'admin-courses',
+                component: () => import('@/views/admin/courses/CourseListView.vue')
+            },
+            {
+                path: 'professors',
+                name: 'admin-professors',
+                component: () => import('@/views/admin/requests/ProfessorsRequestView.vue')
+            }
+        ],
+        meta: { requiresAuth: true, role: 'ROLE_ADMIN' }
+    }
 ]
 
 export const router = createRouter({
