@@ -19,6 +19,9 @@ describe('Registro de Profesor', () => {
         // Selecciona el rol profesor
         cy.get('[data-cy=selectedRole]').click();
         cy.contains('Profesor').click();
+
+        // Esperar que se haga el re-render
+        cy.wait(500);
     });
 
     it('No debe registrar profesor sin nombre', () => {
