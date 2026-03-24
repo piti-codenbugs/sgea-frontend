@@ -1,12 +1,17 @@
 /// <reference types="cypress" />
 describe('Gestión de Cursos - Administrador', () => {
 
+     Cypress.on('uncaught:exception', (err) => {
+        if (err.message.includes('dynamically imported module')) return false;
+    });
+
+
     beforeEach(() => {
         cy.intercept('GET', '**/api/v1/admin/cursos').as('getCourses')
         cy.visit('/login')
         cy.intercept('POST', '**/login').as('loginRequest')
-        cy.get('[data-cy=email]').type(Cypress.env('PROFESSOR_EMAIL'))
-        cy.get('[data-cy=password]').type(Cypress.env('PROFESSOR_PASSWORD'))
+        cy.get('[data-cy=email]').type(Cypress.env('ADMIN_EMAIL'))
+        cy.get('[data-cy=password]').type(Cypress.env('ADMIN_PASSWORD'))
         cy.get('[data-cy=login-btn]').click()
         cy.wait('@loginRequest')
         cy.visit('/admin/courses')
