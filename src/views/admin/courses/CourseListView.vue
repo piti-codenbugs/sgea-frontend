@@ -20,7 +20,6 @@ const selectedCourse = ref<CourseDto | null>(null)
 const headers: ReadonlyDataTableHeader = [
   { title: 'Código', key: 'code', align: 'start', sortable: true },
   { title: 'Nombre del Curso', key: 'name', align: 'start' },
-  { title: 'Semestre', key: 'semester', align: 'center' },
   { title: 'Docente Asignado', key: 'professorName', sortable: false },
   { title: 'Acciones', key: 'actions', sortable: false, align: 'center' },
 ]
@@ -120,11 +119,7 @@ onMounted(loadData)
 
     <v-card border flat rounded="lg">
       <v-data-table :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
-
-        <template v-slot:item.semester="{ item }">
-          {{ item.semester }}° Semestre
-        </template>
-
+        
         <template v-slot:item.professorName="{ item }">
           <div class="d-flex align-center">
             <span :class="!item.professorId ? 'text-grey italic' : ''">
