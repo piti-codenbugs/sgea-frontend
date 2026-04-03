@@ -6,7 +6,13 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const navLinks = [
+  { title: 'Inicio', icon: 'mdi-home-outline', to: { name: 'professor-home' } },
   { title: 'Mis Cursos', icon: 'mdi-book-open-variant', to: { name: 'professor-courses' } },
+  {
+    title: 'Equivalencias Pendientes',
+    icon: 'mdi-file-document-edit-outline',
+    to: { name: 'professor-equivalencies-pending' }
+  },
 ]
 
 const handleLogout = () => {
@@ -17,8 +23,8 @@ const handleLogout = () => {
 
 <template>
   <v-app>
-    <v-app-bar color="primary" elevation="3">
-      <v-app-bar-title class="font-weight-bold">
+    <v-app-bar color="primary" elevation="2" class="professor-app-bar">
+      <v-app-bar-title class="font-weight-bold tracking-tight">
         SGEA <span class="text-subtitle-2 font-weight-thin d-none d-sm-inline">| Docente</span>
       </v-app-bar-title>
 
@@ -53,7 +59,7 @@ const handleLogout = () => {
               </v-avatar>
             </template>
             <v-list-item-title class="font-weight-bold">{{ auth.user?.name }}</v-list-item-title>
-            <v-list-item-subtitle class="text-caption">Administrador de Sistema</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-caption">Docente</v-list-item-subtitle>
           </v-list-item>
 
           <v-divider></v-divider>
@@ -69,10 +75,32 @@ const handleLogout = () => {
       </v-menu>
     </v-app-bar>
 
-    <v-main class="bg-grey-lighten-4">
-      <v-container fluid class="pa-4 pa-md-6">
+    <v-main class="professor-shell">
+      <v-container fluid class="pa-4 pa-md-6 professor-shell__content">
         <router-view />
       </v-container>
     </v-main>
   </v-app>
 </template>
+
+<style scoped>
+.professor-app-bar {
+  backdrop-filter: blur(14px);
+}
+
+.professor-shell {
+  background:
+    radial-gradient(circle at top left, rgba(25, 118, 210, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(255, 152, 0, 0.08), transparent 22%),
+    linear-gradient(180deg, #f7f8fc 0%, #eef2f8 100%);
+  min-height: calc(100vh - 64px);
+}
+
+.professor-shell__content {
+  max-width: 1280px;
+}
+
+.tracking-tight {
+  letter-spacing: 0.01em;
+}
+</style>

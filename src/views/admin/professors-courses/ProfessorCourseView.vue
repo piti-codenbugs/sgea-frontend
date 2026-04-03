@@ -27,13 +27,13 @@ const headers = [
     { title: 'Correo', key: 'email', align: 'start' },
     { title: 'Cant. Cursos', key: 'coursesCount', align: 'center' },
     { title: 'Acciones', key: 'actions', sortable: false, align: 'end' },
-]
+] as const
 
 const courseHeaders = [
     { title: 'Curso', key: 'name', align: 'start' },
     { title: 'Código', key: 'code', align: 'start' },
     { title: 'Acción', key: 'action', align: 'end', sortable: false },
-]
+] as const
 
 const availableProfessors = computed(() => {
     return professors.value.map((p: any) => ({
