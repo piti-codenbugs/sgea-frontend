@@ -51,5 +51,32 @@ export const adminService = {
     async updateCourse(code: number, payload: UpdateCourseRequestDto): Promise<CourseDto> {
         const { data } = await api.put<CourseDto>(`/admin/cursos/${code}`, payload)
         return data
-    }
+    },
+
+    async assignCourses(payload: { professorId: number; courseCodes: number[], period: string }) {
+        const { data } = await api.post('/course-assignment/assignments', payload)
+        return data
+    },
+
+    async getAssignments() {
+        const { data } = await api.get('/course-assignment/assignments')
+        return data
+    },
+
+    async getProfessorsByStatus(status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'): Promise<ProfessorDto[]> {
+        const { data } = await api.get<ProfessorDto[]>('/professor', {
+            params: { status }
+        })
+        return data
+    },
+
+    async updateAssignment(id: number, payload: { professorId: number; courseCode: number; period: string }) {
+        const { data } = await api.put(`/course-assignment/assignments/${id}`, payload)
+        return data
+    },
+
+    async deleteAssignment(id: number) {
+        const { data } = await api.delete(`/course-assignment/assignments/${id}`)
+        return data
+    },
 }

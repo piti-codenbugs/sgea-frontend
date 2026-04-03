@@ -34,7 +34,7 @@ const loadData = async () => {
   try {
     const [coursesResult, profsResult] = await Promise.allSettled([
       adminService.getCourses(),
-      adminService.getProfessorRequests()
+      adminService.getProfessorsByStatus('APROBADO')
     ])
     if (coursesResult.status === 'fulfilled') courses.value = coursesResult.value || []
     if (profsResult.status === 'fulfilled') teachers.value = profsResult.value || []
@@ -60,12 +60,12 @@ const selectTeacher = async (professor: ProfessorDto) => {
   if (!course) return;
 
   try {
-    await adminService.updateCourse(course.code, { 
-      professorId: professor.id 
+    await adminService.updateCourse(course.code, {
+      professorId: professor.id
     });
 
     const index = courses.value.findIndex(c => c.code === course.code);
-    
+
 
     if (index !== -1 && courses.value[index]) {
       courses.value[index].professorId = professor.id;
@@ -73,7 +73,7 @@ const selectTeacher = async (professor: ProfessorDto) => {
 
     teacherDialog.value = false;
     teacherSearch.value = '';
-    
+
   } catch (e) {
     console.error("Error en la asignación:", e);
     alert("No se pudo asignar el docente al curso.");
@@ -83,7 +83,6 @@ const selectTeacher = async (professor: ProfessorDto) => {
 const filteredTeachers = computed(() => {
   const q = teacherSearch.value.toLowerCase()
   return teachers.value
-    .filter(p => p.status === 'APROBADO')
     .map(p => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }))
     .filter(p => p.fullName.toLowerCase().includes(q))
 })
