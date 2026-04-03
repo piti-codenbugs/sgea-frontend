@@ -6,10 +6,12 @@ const professors = ref<any[]>([])
 const allCourses = ref<any[]>([]) 
 const loading = ref(false)
 const searchQuery = ref('')
-const expanded = ref([])
+const expanded = ref<number[]>([])
+const tableRefreshKey = ref(0)
 
 const assignmentProfessorId = ref<number | null>(null)
 const assignmentCourseIds = ref<number[]>([])
+const assignmentPeriod = ref('')
 const assignLoading = ref(false)
 const assignError = ref('')
 const assignSuccess = ref('')
@@ -47,6 +49,14 @@ const availableCourses = computed(() => {
     }))
 })
 
+const getCurrentAcademicPeriod = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const semester = month <= 6 ? '01' : '02'
+  return `${year}-${semester}`
+}
+
 const fetchAssignments = async () => {
   loading.value = true
   try {
@@ -82,6 +92,8 @@ const fetchAssignments = async () => {
         coursesCount: professorCourses.length,
       }
     })
+
+    tableRefreshKey.value += 1
   } catch (error) {
     console.error('Error al obtener asignaciones:', error)
     professors.value = []
@@ -108,21 +120,64 @@ const openAssignDialog = (professor: any) => {
     fetchAllCourses()
 }
 
+const closeAssignDialog = async () => {
+  const currentProfessorId = selectedProfessor.value?.id
+  await fetchAssignments()
+
+  if (currentProfessorId) {
+    const refreshedProfessor = professors.value.find((p: any) => p.id === currentProfessorId)
+    if (refreshedProfessor) {
+      expanded.value = [currentProfessorId]
+      selectedProfessor.value = refreshedProfessor
+    } else {
+      expanded.value = []
+      selectedProfessor.value = null
+    }
+  } else {
+    expanded.value = []
+    selectedProfessor.value = null
+  }
+
+  isAssignDialogOpen.value = false
+}
+
 const isAssigned = (courseCode: number) => {
   return selectedProfessor.value?.courses?.some((c: any) => c.code === courseCode)
 }
 
 const handleToggleCourse = async (course: any) => {
-    actionLoading.value = course.code
-    try {
-        if (isAssigned(course.code)) {
-            console.log("Quitando curso:", course.name, "al profesor:", selectedProfessor.value.id)
-        } else {
-            console.log("Asignando curso:", course.name, "al profesor:", selectedProfessor.value.id)
-        }
-    } finally {
-        actionLoading.value = null
+  if (!selectedProfessor.value) return
+
+  actionLoading.value = course.code
+  try {
+    const assignedCourse = selectedProfessor.value.courses?.find((c: any) => c.code === course.code)
+
+    if (assignedCourse) {
+      await adminService.deleteAssignment(assignedCourse.id)
+    } else {
+      const payload = {
+        professorId: selectedProfessor.value.id,
+        courseCodes: [course.code],
+        period: assignmentPeriod.value || getCurrentAcademicPeriod(),
+      }
+
+      await adminService.assignCourses(payload)
     }
+
+    await fetchAssignments()
+
+    const refreshedProfessor = professors.value.find((p: any) => p.id === selectedProfessor.value.id)
+    if (refreshedProfessor) {
+      selectedProfessor.value = {
+        ...refreshedProfessor,
+        courses: [...(refreshedProfessor.courses || [])],
+      }
+    }
+  } catch (error) {
+    console.error('Error al gestionar curso:', error)
+  } finally {
+    actionLoading.value = null
+  }
 }
 
 const handleAssignCourses = async () => {
@@ -135,21 +190,28 @@ const handleAssignCourses = async () => {
     }
 
     if (!assignmentCourseIds.value.length) {
-        assignError.value = 'Debe seleccionar al menos un curso.'
-        return
+      assignError.value = 'Debe seleccionar al menos un curso.'
+      return
+    }
+
+    if (!assignmentPeriod.value) {
+      assignError.value = 'No se pudo determinar el período actual.'
+      return
     }
 
     assignLoading.value = true
     try {
         const payload = {
             professorId: assignmentProfessorId.value,
-            courseCode: assignmentCourseIds.value,
+            courseCodes: assignmentCourseIds.value,
+            period: assignmentPeriod.value,
         }
 
         await adminService.assignCourses(payload)
         assignSuccess.value = 'Cursos asignados correctamente.'
         assignmentProfessorId.value = null
         assignmentCourseIds.value = []
+        assignmentPeriod.value = getCurrentAcademicPeriod()
         await fetchAssignments()
     } catch (error: any) {
         console.error('Error al asignar cursos:', error)
@@ -169,7 +231,8 @@ const filteredProfessors = computed(() => {
 })
 
 onMounted(async () => {
-    await Promise.all([fetchAssignments(), fetchAllCourses()])
+  assignmentPeriod.value = getCurrentAcademicPeriod()
+  await Promise.all([fetchAssignments(), fetchAllCourses()])
 })
 </script>
 
@@ -207,15 +270,24 @@ onMounted(async () => {
                     />
                 </v-col>
 
-                <v-col cols="12" md="6">
-                    <v-select
-                        v-model="assignmentCourseIds"
-                        :items="availableCourses"
-                        label="Seleccionar cursos"
-                        variant="outlined"
-                        multiple
-                        chips
-                    />
+              <v-col cols="12" md="4">
+                <v-select
+                    v-model="assignmentCourseIds"
+                    :items="availableCourses"
+                    label="Seleccionar cursos"
+                    variant="outlined"
+                    multiple
+                    chips
+                />
+              </v-col>
+
+                <v-col cols="12" md="2">
+                  <v-text-field
+                      v-model="assignmentPeriod"
+                      label="Período"
+                      variant="outlined"
+                      readonly
+                  />
                 </v-col>
 
                 <v-col cols="12" md="2" class="d-flex align-end">
@@ -240,14 +312,15 @@ onMounted(async () => {
         </v-card>
 
         <v-card border flat rounded="lg">
-            <v-data-table 
-                v-model:expanded="expanded"
-                :headers="headers" 
-                :items="filteredProfessors" 
-                :search="searchQuery"
-                item-value="code"
-                show-expand
-            >
+          <v-data-table
+              :key="tableRefreshKey"
+              v-model:expanded="expanded"
+              :headers="headers"
+              :items="filteredProfessors"
+              :search="searchQuery"
+              item-value="id"
+              show-expand
+          >
                 <template v-slot:item.coursesCount="{ item }">
                     <v-chip size="small" :color="item.coursesCount > 0 ? 'primary' : 'grey'">
                         {{ item.coursesCount }} Cursos
@@ -291,41 +364,44 @@ onMounted(async () => {
                         <div class="text-caption" style="opacity: 0.8">Docente: {{ selectedProfessor?.fullName }}</div>
                     </div>
                     <v-spacer></v-spacer>
-                    <v-btn icon="mdi-close" variant="text" color="white" @click="isAssignDialogOpen = false"></v-btn>
+                    <v-btn icon="mdi-close" variant="text" color="white" @click="closeAssignDialog"></v-btn>
                 </v-card-title>
 
                 <v-card-text class="pa-0">
                     <div class="pa-4 bg-grey-lighten-4">
-                        <v-text-field 
-                            v-model="courseSearchQuery" 
+                        <v-text-field
+                            v-model="courseSearchQuery"
                             placeholder="Buscar curso por nombre o código..."
-                            variant="solo" 
-                            density="compact" 
-                            prepend-inner-icon="mdi-filter-variant" 
+                            variant="solo"
+                            density="compact"
+                            prepend-inner-icon="mdi-filter-variant"
                             hide-details
                             flat
                         ></v-text-field>
                     </div>
 
-                    <v-data-table 
-                        :headers="courseHeaders" 
-                        :items="allCourses" 
+                    <v-data-table
+                        :headers="courseHeaders"
+                        :items="allCourses"
                         :loading="dialogLoading"
                         :search="courseSearchQuery"
                         item-value="code"
-                        density="comfortable" 
+                        density="comfortable"
                         height="350px"
                         fixed-header
                     >
                         <template v-slot:item.action="{ item }">
-                            <v-btn 
+                            <v-btn
+                                :key="`${item.code}-${isAssigned(item.code)}`"
                                 :color="isAssigned(item.code) ? 'error' : 'success'"
                                 :variant="isAssigned(item.code) ? 'tonal' : 'elevated'"
                                 size="x-small"
                                 :loading="actionLoading === item.code"
                                 @click="handleToggleCourse(item)"
-                                :prepend-icon="isAssigned(item.code) ? 'mdi-minus' : 'mdi-plus'"
                             >
+                                <v-icon start>
+                                    {{ isAssigned(item.code) ? 'mdi-minus' : 'mdi-plus' }}
+                                </v-icon>
                                 {{ isAssigned(item.code) ? 'Quitar' : 'Asignar' }}
                             </v-btn>
                         </template>
@@ -337,13 +413,6 @@ onMounted(async () => {
                 </v-card-text>
 
                 <v-divider></v-divider>
-                <v-card-actions class="pa-4">
-                    <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="isAssignDialogOpen = false">Cancelar</v-btn>
-                    <v-btn color="primary" variant="flat" rounded="lg" width="120" @click="isAssignDialogOpen = false">
-                        Listo
-                    </v-btn>
-                </v-card-actions>
             </v-card>
         </v-dialog>
     </v-container>

@@ -53,7 +53,7 @@ export const adminService = {
         return data
     },
 
-    async assignCourses(payload: { professorId: number; courseCode: number[] }) {
+    async assignCourses(payload: { professorId: number; courseCodes: number[], period: string }) {
         const { data } = await api.post('/course-assignment/assignments', payload)
         return data
     },
@@ -68,5 +68,15 @@ export const adminService = {
             params: { status }
         })
         return data
-    }
+    },
+
+    async updateAssignment(id: number, payload: { professorId: number; courseCode: number; period: string }) {
+        const { data } = await api.put(`/course-assignment/assignments/${id}`, payload)
+        return data
+    },
+
+    async deleteAssignment(id: number) {
+        const { data } = await api.delete(`/course-assignment/assignments/${id}`)
+        return data
+    },
 }
