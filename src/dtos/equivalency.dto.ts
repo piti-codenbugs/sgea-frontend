@@ -9,9 +9,11 @@ export interface EquivalencyRequestDto {
   destinationCourseCode: number
   destinationCourseName?: string
   studentId: number
+  studentFullName?: string
   professorId: number
   professorFullName?: string
   status: EquivalencyStatus
+  comment?: string | null
   programUrl: string
   courseCertificateUrl: string
   signedProgramUrl?: string | null
@@ -25,14 +27,15 @@ export interface EquivalencyRequestDto {
 
 export interface ProgramCourseDto {
   id: number
-  courseCode: number
-  courseName: string
-  professorId: number
-  professorName: string
+  courseCode: string
+  courseName?: string | null
+  professorId?: number | null
+  professorName?: string | null
   year: number
   semester: number
   section: string
   programUrl: string
+  createdAt?: string
 }
 
 export interface CreateEquivalencyRequestDto {

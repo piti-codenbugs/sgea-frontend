@@ -23,6 +23,13 @@ const auth = useAuthStore()
                 <v-btn color="primary" prepend-icon="mdi-book-open-variant" :to="{ name: 'professor-courses' }">
                     Ver Mis Cursos
                 </v-btn>
+                <v-btn
+                    color="secondary"
+                    prepend-icon="mdi-file-document-edit-outline"
+                    :to="{ name: 'professor-equivalencies-pending' }"
+                >
+                    Revisar Equivalencias Pendientes
+                </v-btn>
             </div>
         </v-card>
     </v-container>

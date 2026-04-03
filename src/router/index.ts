@@ -57,6 +57,16 @@ const routes = [
                 path: 'my-courses',
                 name: 'professor-courses',
                 component: () => import('@/views/professor/ProfessorCoursesView.vue')
+            },
+            {
+                path: 'equivalencies/pending',
+                name: 'professor-equivalencies-pending',
+                component: () => import('@/views/professor/equivalencies/ProfessorPendingEquivalenciesView.vue')
+            },
+            {
+                path: 'equivalencies/:id',
+                name: 'professor-equivalency-review',
+                component: () => import('@/views/professor/equivalencies/ProfessorEquivalencyReviewView.vue')
             }
         ],
         meta: { requiresAuth: true, role: 'ROLE_PROFESSOR' }

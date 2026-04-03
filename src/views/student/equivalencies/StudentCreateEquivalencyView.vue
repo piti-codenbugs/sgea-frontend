@@ -140,6 +140,15 @@ const selectOriginCourse = (course: ProgramCourseDto) => {
     selectedOriginCourse.value = course
 }
 
+const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return '-'
+    return new Date(dateString).toLocaleDateString('es-ES')
+}
+
+const openProgram = (url: string) => {
+    window.open(url, '_blank')
+}
+
 const isSection1Valid = computed(() => {
     return destinationCourseCode.value && professorId.value && certificateFile.value
 })
@@ -375,54 +384,66 @@ const professorName = computed(() => {
                                     </ol>
                                 </v-alert>
 
-                                <div v-else>
-                                    <v-alert type="success" class="mb-4">
-                                        <v-alert-title class="font-weight-bold"> Cursos encontrados </v-alert-title>
-                                        Selecciona uno de los cursos disponibles:
-                                    </v-alert>
-
+                                <v-card variant="outlined" class="mb-4">
                                     <v-table>
                                         <thead>
                                             <tr>
-                                                <th>Código</th>
-                                                <th>Nombre del Curso</th>
-                                                <th>Docente</th>
+                                                <th>Código origen</th>
+                                                <th>Año</th>
                                                 <th>Semestre</th>
+                                                <th>Sección</th>
+                                                <th>Fecha creación</th>
+                                                <th>Programa</th>
                                                 <th>Acción</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr v-for="course in searchResults" :key="course.id">
                                                 <td class="font-weight-bold">{{ course.courseCode }}</td>
-                                                <td>{{ course.courseName }}</td>
-                                                <td>{{ course.professorName }}</td>
+                                                <td>{{ course.year }}</td>
                                                 <td class="text-center">{{ course.semester }}</td>
+                                                <td>{{ course.section }}</td>
+                                                <td>{{ formatDate(course.createdAt) }}</td>
+                                                <td>
+                                                    <v-btn
+                                                        size="small"
+                                                        variant="text"
+                                                        color="primary"
+                                                        @click="openProgram(course.programUrl)"
+                                                    >
+                                                        <v-icon start>mdi-file-pdf-box</v-icon>
+                                                        Ver programa
+                                                    </v-btn>
+                                                </td>
                                                 <td class="text-center">
-                                                    <v-btn @click="selectOriginCourse(course)"
-                                                        :outlined="selectedOriginCourse?.id !== course.id"
+                                                    <v-btn
+                                                        @click="selectOriginCourse(course)"
+                                                        :variant="selectedOriginCourse?.id === course.id ? 'flat' : 'outlined'"
                                                         :color="selectedOriginCourse?.id === course.id ? 'success' : 'primary'"
-                                                        size="small" density="compact">
+                                                        size="small"
+                                                        density="compact"
+                                                    >
                                                         {{
                                                             selectedOriginCourse?.id === course.id
                                                                 ? 'Seleccionado'
-                                                        : 'Seleccionar'
+                                                                : 'Seleccionar'
                                                         }}
                                                     </v-btn>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </v-table>
+                                </v-card>
 
-                                    <v-divider class="my-4"></v-divider>
+                                <v-divider class="my-4"></v-divider>
 
-                                    <div class="text-body-2 mb-4">
-                                        <strong>Curso Origen Seleccionado:</strong>
-                                        <span v-if="selectedOriginCourse" class="text-success font-weight-bold">
-                                            {{ selectedOriginCourse.courseCode }} - {{ selectedOriginCourse.courseName
-                                            }}
-                                        </span>
-                                        <span v-else class="text-secondary"> Ninguno </span>
-                                    </div>
+                                <div class="text-body-2 mb-4">
+                                    <strong>Programa seleccionado:</strong>
+                                    <span v-if="selectedOriginCourse" class="text-success font-weight-bold">
+                                        {{ selectedOriginCourse.courseCode }} - Año {{ selectedOriginCourse.year }},
+                                        Semestre {{ selectedOriginCourse.semester }}, Sección {{ selectedOriginCourse.section }}
+                                    </span>
+                                    <span v-else class="text-secondary"> Ninguno </span>
                                 </div>
                             </div>
 
@@ -478,7 +499,7 @@ const professorName = computed(() => {
                                     <div class="mb-3" v-if="selectedOriginCourse">
                                         <div class="text-caption text-secondary">Curso Origen</div>
                                         <div class="text-body-2 font-weight-bold">
-                                            {{ selectedOriginCourse.courseCode }} - {{ selectedOriginCourse.courseName
+                                            {{ selectedOriginCourse.courseCode }} - {{ selectedOriginCourse.courseName || '-'
                                             }}
                                         </div>
                                     </div>

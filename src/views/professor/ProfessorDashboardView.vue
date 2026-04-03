@@ -8,6 +8,11 @@ const auth = useAuthStore()
 const navLinks = [
   { title: 'Inicio', icon: 'mdi-home-outline', to: { name: 'professor-home' } },
   { title: 'Mis Cursos', icon: 'mdi-book-open-variant', to: { name: 'professor-courses' } },
+  {
+    title: 'Equivalencias Pendientes',
+    icon: 'mdi-file-document-edit-outline',
+    to: { name: 'professor-equivalencies-pending' }
+  },
 ]
 
 const handleLogout = () => {

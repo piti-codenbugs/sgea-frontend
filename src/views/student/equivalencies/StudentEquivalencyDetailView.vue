@@ -202,6 +202,15 @@ const getFileNameFromUrl = (url: string): string => {
               </v-col>
             </v-row>
 
+            <v-row v-if="request.status === 'RECHAZADO' && request.comment" class="mb-6">
+              <v-col cols="12">
+                <v-alert type="error" variant="tonal">
+                  <v-alert-title>Motivo de rechazo</v-alert-title>
+                  {{ request.comment }}
+                </v-alert>
+              </v-col>
+            </v-row>
+
             <v-divider class="my-4" />
 
             <!-- Archivos Adjuntos -->
