@@ -253,13 +253,13 @@ const getFileNameFromUrl = (url: string): string => {
                 </v-card>
               </v-col>
 
-              <!-- Constancia de Calificaciones -->
+              <!-- Constancia de Cursos -->
               <v-col cols="12">
                 <v-card variant="outlined" class="pa-4 mb-4">
                   <div class="d-flex justify-space-between align-center">
                     <div>
                       <div class="text-subtitle-2 font-weight-bold">
-                        Constancia de Calificaciones
+                        Constancia de Cursos
                       </div>
                       <div class="text-caption text-secondary mt-1">
                         Documento que prueba el desempeño en el curso

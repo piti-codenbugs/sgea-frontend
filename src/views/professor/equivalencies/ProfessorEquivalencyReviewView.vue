@@ -249,7 +249,7 @@ const submitApprove = async () => {
 
               <v-col cols="12" md="6">
                 <v-card variant="outlined" class="pa-4 h-100">
-                  <div class="text-subtitle-2 font-weight-bold">Constancia de Calificaciones</div>
+                  <div class="text-subtitle-2 font-weight-bold">Constancia de Cursos</div>
                   <div class="text-caption text-secondary mb-3">Archivo enviado por estudiante</div>
                   <v-btn block color="primary" variant="tonal" @click="openPdfInNewTab(request.courseCertificateUrl)">
                     <v-icon start>mdi-eye</v-icon>

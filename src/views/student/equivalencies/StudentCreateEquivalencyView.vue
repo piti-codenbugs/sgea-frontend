@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { CourseDto } from '@/dtos/course.dto'
 import type { ProfessorDto } from '@/dtos/professor.dto'
@@ -35,7 +35,9 @@ const programFilename = ref('')
 // Catálogos
 const courses = ref<CourseDto[]>([])
 const professors = ref<ProfessorDto[]>([])
+const filteredProfessors = ref<ProfessorDto[]>([])
 const loadingData = ref(false)
+const loadingProfessors = ref(false)
 
 onMounted(async () => {
     await loadData()
@@ -63,6 +65,26 @@ const loadData = async () => {
         loadingData.value = false
     }
 }
+
+watch(destinationCourseCode, async (newCourseCode) => {
+    if (newCourseCode === null) {
+        filteredProfessors.value = []
+        professorId.value = null
+        return
+    }
+
+    loadingProfessors.value = true
+    try {
+        filteredProfessors.value = await equivalencyService.getProfessorsByDestinationCourse(newCourseCode)
+        professorId.value = null
+    } catch (e) {
+        error.value = 'Error al cargar los docentes del curso'
+        console.error(e)
+        filteredProfessors.value = []
+    } finally {
+        loadingProfessors.value = false
+    }
+})
 
 const onCertificateFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement
@@ -272,9 +294,11 @@ const professorName = computed(() => {
 
                             <!-- Select Docente -->
                             <div class="mb-6">
-                                <v-select v-model="professorId" :items="professors" item-title="firstName"
+                                <v-select v-model="professorId" :items="filteredProfessors" item-title="firstName"
                                     item-value="id" label="Selecciona el docente responsable" variant="outlined"
-                                    :loading="loadingData" required>
+                                    :loading="loadingProfessors" :disabled="destinationCourseCode === null"
+                                    :placeholder="destinationCourseCode === null ? 'Primero debes seleccionar un curso' : 'Selecciona el docente'"
+                                    required>
                                     <template #item="{ props, item }">
                                         <v-list-item v-bind="props" :title="`${item?.firstName} ${item?.lastName}`">
                                         </v-list-item>
@@ -284,12 +308,15 @@ const professorName = computed(() => {
                                         <span>{{ item?.firstName }} {{ item?.lastName }}</span>
                                     </template>
                                 </v-select>
+                                <v-card-subtitle v-if="filteredProfessors.length === 0 && destinationCourseCode !== null" class="mt-2 text-warning">
+                                    No hay docentes asignados a este curso
+                                </v-card-subtitle>
                             </div>
 
                             <!-- Upload Constancia -->
                             <div class="mb-4">
                                 <label class="text-subtitle-2 font-weight-bold mb-2 d-block">
-                                    Constancia de Calificaciones del Curso Equivalente *
+                                    Constancia de Cursos *
                                 </label>
                                 <input type="file" accept=".pdf" @change="onCertificateFileChange"
                                     class="d-block mb-2" />
@@ -320,7 +347,7 @@ const professorName = computed(() => {
                                     <ul class="mt-2">
                                         <li>Pérdida de matrícula académica</li>
                                         <li>Cancelación de solicitudes pendientes</li>
-                                        <li>Reporte al departamento disciplinario</li>
+                                        <li>Reporte a coordinación</li>
                                     </ul>
                                     Ten en cuenta que toda tu información está registrada con tu carnet de
                                     identificación.

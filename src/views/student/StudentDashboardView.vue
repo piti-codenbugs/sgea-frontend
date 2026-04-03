@@ -7,6 +7,16 @@ const auth = useAuthStore()
 
 const navLinks = [
   { title: 'Inicio', icon: 'mdi-home-outline', to: { name: 'student-home' } },
+  {
+    title: 'Mis Solicitudes',
+    icon: 'mdi-file-document-outline',
+    to: { name: 'student-equivalencies' }
+  },
+  {
+    title: 'Nueva Solicitud',
+    icon: 'mdi-plus-circle-outline',
+    to: { name: 'student-create-equivalency' }
+  },
 ]
 
 const handleLogout = () => {
@@ -17,8 +27,8 @@ const handleLogout = () => {
 
 <template>
   <v-app>
-    <v-app-bar color="primary" elevation="3">
-      <v-app-bar-title class="font-weight-bold">
+    <v-app-bar color="primary" elevation="2" class="student-app-bar">
+      <v-app-bar-title class="font-weight-bold tracking-tight">
         SGEA <span class="text-subtitle-2 font-weight-thin d-none d-sm-inline">| Estudiante</span>
       </v-app-bar-title>
 
@@ -61,10 +71,32 @@ const handleLogout = () => {
       </v-menu>
     </v-app-bar>
 
-    <v-main class="bg-grey-lighten-4">
-      <v-container fluid class="pa-4 pa-md-6">
+    <v-main class="student-shell">
+      <v-container fluid class="pa-4 pa-md-6 student-shell__content">
         <router-view />
       </v-container>
     </v-main>
   </v-app>
 </template>
+
+<style scoped>
+.student-app-bar {
+  backdrop-filter: blur(14px);
+}
+
+.student-shell {
+  background:
+    radial-gradient(circle at top left, rgba(33, 150, 243, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(25, 118, 210, 0.08), transparent 22%),
+    linear-gradient(180deg, #f6f9fe 0%, #eef4fb 100%);
+  min-height: calc(100vh - 64px);
+}
+
+.student-shell__content {
+  max-width: 1280px;
+}
+
+.tracking-tight {
+  letter-spacing: 0.01em;
+}
+</style>

@@ -57,5 +57,10 @@ export const equivalencyService = {
       params: { courseCode }
     })
     return response.data
+  },
+
+  async getProfessorsByDestinationCourse(courseCode: number): Promise<ProfessorDto[]> {
+    const response = await api.get<ProfessorDto[]>(`/equivalencias/professors-by-course/${courseCode}`)
+    return response.data
   }
 }
