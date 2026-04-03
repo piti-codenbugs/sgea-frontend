@@ -6,6 +6,7 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const navLinks = [
+  { title: 'Inicio', icon: 'mdi-home-outline', to: { name: 'professor-home' } },
   { title: 'Mis Cursos', icon: 'mdi-book-open-variant', to: { name: 'professor-courses' } },
 ]
 
@@ -53,7 +54,7 @@ const handleLogout = () => {
               </v-avatar>
             </template>
             <v-list-item-title class="font-weight-bold">{{ auth.user?.name }}</v-list-item-title>
-            <v-list-item-subtitle class="text-caption">Administrador de Sistema</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-caption">Docente</v-list-item-subtitle>
           </v-list-item>
 
           <v-divider></v-divider>

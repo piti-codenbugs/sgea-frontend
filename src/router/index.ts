@@ -3,9 +3,7 @@ import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import WelcomeView from '../views/WelcomeView.vue'
 import StudentDashboardView from '../views/student/StudentDashboardView.vue'
-import ProfessorDashboardView from '../views/professor/ProfessorDashboardView.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
-import { components } from 'vuetify/dist/vuetify.js'
 
 const routes = [
     { path: '/', component: WelcomeView },
@@ -22,12 +20,39 @@ const routes = [
     {
         path: '/student/dashboard',
         component: StudentDashboardView,
-        meta: { requiresAuth: true, role: 'STUDENT' }
+        children: [
+            {
+                path: '',
+                name: 'student-home',
+                component: () => import('@/views/student/StudentHomeView.vue')
+            },
+            {
+                path: 'equivalencies',
+                name: 'student-equivalencies',
+                component: () => import('@/views/student/equivalencies/StudentEquivalenciesListView.vue')
+            },
+            {
+                path: 'equivalencies/create',
+                name: 'student-create-equivalency',
+                component: () => import('@/views/student/equivalencies/StudentCreateEquivalencyView.vue')
+            },
+            {
+                path: 'equivalencies/:id',
+                name: 'student-equivalency-detail',
+                component: () => import('@/views/student/equivalencies/StudentEquivalencyDetailView.vue')
+            }
+        ],
+        meta: { requiresAuth: true, role: 'ROLE_STUDENT' }
     },
     {
         path: '/professor',
         component: () => import('@/views/professor/ProfessorDashboardView.vue'),
         children: [
+            {
+                path: '',
+                name: 'professor-home',
+                component: () => import('@/views/professor/ProfessorHomeView.vue')
+            },
             {
                 path: 'my-courses',
                 name: 'professor-courses',
