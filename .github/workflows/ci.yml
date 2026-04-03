@@ -34,3 +34,5 @@ jobs:
           CYPRESS_STUDENT_PASSWORD: contraseñaAdmin01
           CYPRESS_PROFESSOR_EMAIL: docente1@test.com
           CYPRESS_PROFESSOR_PASSWORD: contraseñaAdmin01
+          CYPRESS_ADMIN_EMAIL: admin1@test.com
+          CYPRESS_ADMIN_PASSWORD: contraseñaAdmin01
