@@ -20,7 +20,6 @@ const selectedCourse = ref<CourseDto | null>(null)
 const headers: ReadonlyDataTableHeader = [
   { title: 'Código', key: 'code', align: 'start', sortable: true },
   { title: 'Nombre del Curso', key: 'name', align: 'start' },
-  { title: 'Semestre', key: 'semester', align: 'center' },
   { title: 'Docente Asignado', key: 'professorName', sortable: false },
   { title: 'Acciones', key: 'actions', sortable: false, align: 'center' },
 ]
@@ -35,7 +34,7 @@ const loadData = async () => {
   try {
     const [coursesResult, profsResult] = await Promise.allSettled([
       adminService.getCourses(),
-      adminService.getProfessorRequests()
+      adminService.getProfessorsByStatus('APROBADO')
     ])
     if (coursesResult.status === 'fulfilled') courses.value = coursesResult.value || []
     if (profsResult.status === 'fulfilled') teachers.value = profsResult.value || []
@@ -61,12 +60,12 @@ const selectTeacher = async (professor: ProfessorDto) => {
   if (!course) return;
 
   try {
-    await adminService.updateCourse(course.code, { 
-      professorId: professor.id 
+    await adminService.updateCourse(course.code, {
+      professorId: professor.id
     });
 
     const index = courses.value.findIndex(c => c.code === course.code);
-    
+
 
     if (index !== -1 && courses.value[index]) {
       courses.value[index].professorId = professor.id;
@@ -74,7 +73,7 @@ const selectTeacher = async (professor: ProfessorDto) => {
 
     teacherDialog.value = false;
     teacherSearch.value = '';
-    
+
   } catch (e) {
     console.error("Error en la asignación:", e);
     alert("No se pudo asignar el docente al curso.");
@@ -84,7 +83,6 @@ const selectTeacher = async (professor: ProfessorDto) => {
 const filteredTeachers = computed(() => {
   const q = teacherSearch.value.toLowerCase()
   return teachers.value
-    .filter(p => p.status === 'APROBADO')
     .map(p => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }))
     .filter(p => p.fullName.toLowerCase().includes(q))
 })
@@ -112,31 +110,27 @@ onMounted(loadData)
     <div class="d-flex align-center mb-6">
       <h1 class="text-h4 font-weight-bold text-primary">Gestión de Cursos</h1>
       <v-spacer></v-spacer>
-      <v-btn data-cy="refresh-btn" icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
+      <v-btn icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
     </div>
 
-    <v-text-field data-cy="search-input" v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar curso..." variant="outlined"
+    <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar curso..." variant="outlined"
       rounded="lg" class="mb-6 bg-white" hide-details clearable></v-text-field>
 
     <v-card border flat rounded="lg">
-      <v-data-table data-cy="courses-table" :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
-
-        <template v-slot:item.semester="{ item }">
-          <span data-cy="course-semester">{{ item.semester }}° Semestre</span>
-        </template>
+      <v-data-table :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
 
         <template v-slot:item.professorName="{ item }">
           <div class="d-flex align-center">
-            <span data-cy="course-professor" :class="!item.professorId ? 'text-grey italic' : ''">
+            <span :class="!item.professorId ? 'text-grey italic' : ''">
               {{ getProfessorName(item.professorId) }}
             </span>
-            <v-btn data-cy="assign-teacher-btn" icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
+            <v-btn icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
               @click="openTeacherPicker(item)"></v-btn>
           </div>
         </template>
 
         <template v-slot:item.actions="{ item }">
-          <v-btn data-cy="edit-btn" icon="mdi-pencil" color="primary" variant="text" @click="openEdit(item)"></v-btn>
+          <v-btn icon="mdi-pencil" color="primary" variant="text" @click="openEdit(item)"></v-btn>
         </template>
       </v-data-table>
     </v-card>

@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { professorService } from '@/services/professor/professorService'
-import type { CourseDto } from '@/dtos/course.dto'
 import type { VDataTable } from 'vuetify/components'
 
 type Headers = VDataTable['$props']['headers']
 
-const myCourses = ref<CourseDto[]>([])
+type ProfessorCourseRow = {
+    id: number
+    code: number
+    name: string
+    period: string
+    assignmentDate: string
+}
+
+const myCourses = ref<ProfessorCourseRow[]>([])
 const loading = ref(false)
 // 1. Nueva variable reactiva para la búsqueda
 const searchQuery = ref('')
@@ -14,15 +21,20 @@ const searchQuery = ref('')
 const headers: Headers = [
     { title: 'Código', key: 'code', align: 'start', sortable: true },
     { title: 'Nombre del Curso', key: 'name', align: 'start' },
-    { title: 'Semestre', key: 'semester', align: 'center' },
-    { title: 'Pensum', key: 'curriculum', align: 'start' },
-    { title: 'Acciones', key: 'actions', sortable: false, align: 'center' },
+    { title: 'Período', key: 'period', align: 'center' },
+    { title: 'Fecha de Asignación', key: 'assignmentDate', align: 'center' },
 ]
 
 const loadCourses = async () => {
     loading.value = true
     try {
-        myCourses.value = await professorService.getMyCourses()
+      myCourses.value = (await professorService.getMyCourses()).map((course: any) => ({
+        id: course.id,
+        code: course.courseCode,
+        name: course.courseName,
+        period: course.period,
+        assignmentDate: course.assignmentDate,
+      }))
     } catch (error) {
         console.error("Error al cargar mis cursos:", error)
     } finally {
@@ -53,23 +65,20 @@ onMounted(loadCourses)
         ></v-text-field>
 
         <v-card border flat rounded="lg">
-            <v-data-table 
-                :headers="headers" 
-                :items="myCourses" 
+            <v-data-table
+                :headers="headers"
+                :items="myCourses"
                 :search="searchQuery"
-                :loading="loading" 
+                :loading="loading"
                 hover
                 no-data-text="No tienes cursos asignados actualmente"
             >
-                <template v-slot:item.semester="{ item }">
-                    {{ item.semester }}° Semestre
+                <template v-slot:item.period="{ item }">
+                    {{ item.period || 'Sin período' }}
                 </template>
 
-                <template v-slot:item.actions="{ item }">
-                    <v-btn prepend-icon="mdi-eye" color="secondary" variant="text" size="small"
-                        :to="{ name: 'course-details', params: { code: item.code } }">
-                        Ver Detalles
-                    </v-btn>
+                <template v-slot:item.assignmentDate="{ item }">
+                    {{ item.assignmentDate ? new Date(item.assignmentDate).toLocaleString() : 'Sin fecha' }}
                 </template>
             </v-data-table>
         </v-card>

@@ -6,46 +6,100 @@ const professors = ref<any[]>([])
 const allCourses = ref<any[]>([]) 
 const loading = ref(false)
 const searchQuery = ref('')
-const expanded = ref([])
+const expanded = ref<number[]>([])
+const tableRefreshKey = ref(0)
+
+const assignmentProfessorId = ref<number | null>(null)
+const assignmentCourseIds = ref<number[]>([])
+const assignmentPeriod = ref('')
+const assignLoading = ref(false)
+const assignError = ref('')
+const assignSuccess = ref('')
 
 const isAssignDialogOpen = ref(false)
 const selectedProfessor = ref<any>(null)
 const courseSearchQuery = ref('')
 const dialogLoading = ref(false)
-const actionLoading = ref<number | null>(null) 
+const actionLoading = ref<number | null>(null)
 
 const headers = [
     { title: 'Docente', key: 'fullName', align: 'start' },
     { title: 'Correo', key: 'email', align: 'start' },
     { title: 'Cant. Cursos', key: 'coursesCount', align: 'center' },
     { title: 'Acciones', key: 'actions', sortable: false, align: 'end' },
-]
+] as const
 
 const courseHeaders = [
     { title: 'Curso', key: 'name', align: 'start' },
     { title: 'Código', key: 'code', align: 'start' },
     { title: 'Acción', key: 'action', align: 'end', sortable: false },
-]
+] as const
+
+const availableProfessors = computed(() => {
+    return professors.value.map((p: any) => ({
+        title: p.fullName,
+        value: p.id,
+    }))
+})
+
+const availableCourses = computed(() => {
+    return allCourses.value.map((course: any) => ({
+        title: `${course.code} - ${course.name}`,
+        value: course.code,
+    }))
+})
+
+const getCurrentAcademicPeriod = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const semester = month <= 6 ? '01' : '02'
+  return `${year}-${semester}`
+}
 
 const fetchAssignments = async () => {
-    loading.value = true
-    try {
-        const mockProfessors = [
-            { id: 1, firstName: 'Oscar', lastName: 'García', email: 'oscar.garcia@univ.edu', courses: [{ id: 101, name: 'Base de Datos I', code: 'BD1' }] },
-            { id: 2, firstName: 'Ana', lastName: 'Martínez', email: 'ana.mtz@univ.edu', courses: [] },
-            { id: 3, firstName: 'Roberto', lastName: 'Solis', email: 'r.solis@univ.edu', courses: [] }
-        ]
+  loading.value = true
+  try {
+    const [approvedProfessors, assignments] = await Promise.all([
+      adminService.getProfessorsByStatus('APROBADO'),
+      adminService.getAssignments(),
+    ])
 
-        professors.value = mockProfessors.map((p: any) => ({
-            ...p,
-            fullName: `${p.firstName} ${p.lastName}`,
-            coursesCount: p.courses?.length || 0
-        }))
-    } catch (error) {
-        console.error("Error:", error)
-    } finally {
-        loading.value = false
-    }
+    const coursesByProfessorName = (assignments || []).reduce((acc: Record<string, any[]>, assignment: any) => {
+      const professorName = assignment.professorName || 'Sin nombre'
+
+      if (!acc[professorName]) {
+        acc[professorName] = []
+      }
+
+      acc[professorName].push({
+        id: assignment.id,
+        name: assignment.courseName,
+        code: assignment.courseCode,
+      })
+
+      return acc
+    }, {})
+
+    professors.value = (approvedProfessors || []).map((p: any) => {
+      const fullName = `${p.firstName} ${p.lastName}`
+      const professorCourses = coursesByProfessorName[fullName] || []
+
+      return {
+        ...p,
+        fullName,
+        courses: professorCourses,
+        coursesCount: professorCourses.length,
+      }
+    })
+
+    tableRefreshKey.value += 1
+  } catch (error) {
+    console.error('Error al obtener asignaciones:', error)
+    professors.value = []
+  } finally {
+    loading.value = false
+  }
 }
 
 const fetchAllCourses = async () => {
@@ -66,20 +120,104 @@ const openAssignDialog = (professor: any) => {
     fetchAllCourses()
 }
 
-const isAssigned = (courseId: number) => {
-    return selectedProfessor.value?.courses?.some((c: any) => c.id === courseId)
+const closeAssignDialog = async () => {
+  const currentProfessorId = selectedProfessor.value?.id
+  await fetchAssignments()
+
+  if (currentProfessorId) {
+    const refreshedProfessor = professors.value.find((p: any) => p.id === currentProfessorId)
+    if (refreshedProfessor) {
+      expanded.value = [currentProfessorId]
+      selectedProfessor.value = refreshedProfessor
+    } else {
+      expanded.value = []
+      selectedProfessor.value = null
+    }
+  } else {
+    expanded.value = []
+    selectedProfessor.value = null
+  }
+
+  isAssignDialogOpen.value = false
+}
+
+const isAssigned = (courseCode: number) => {
+  return selectedProfessor.value?.courses?.some((c: any) => c.code === courseCode)
 }
 
 const handleToggleCourse = async (course: any) => {
-    actionLoading.value = course.id
+  if (!selectedProfessor.value) return
+
+  actionLoading.value = course.code
+  try {
+    const assignedCourse = selectedProfessor.value.courses?.find((c: any) => c.code === course.code)
+
+    if (assignedCourse) {
+      await adminService.deleteAssignment(assignedCourse.id)
+    } else {
+      const payload = {
+        professorId: selectedProfessor.value.id,
+        courseCodes: [course.code],
+        period: assignmentPeriod.value || getCurrentAcademicPeriod(),
+      }
+
+      await adminService.assignCourses(payload)
+    }
+
+    await fetchAssignments()
+
+    const refreshedProfessor = professors.value.find((p: any) => p.id === selectedProfessor.value.id)
+    if (refreshedProfessor) {
+      selectedProfessor.value = {
+        ...refreshedProfessor,
+        courses: [...(refreshedProfessor.courses || [])],
+      }
+    }
+  } catch (error) {
+    console.error('Error al gestionar curso:', error)
+  } finally {
+    actionLoading.value = null
+  }
+}
+
+const handleAssignCourses = async () => {
+    assignError.value = ''
+    assignSuccess.value = ''
+
+    if (!assignmentProfessorId.value) {
+        assignError.value = 'Debe seleccionar un docente.'
+        return
+    }
+
+    if (!assignmentCourseIds.value.length) {
+      assignError.value = 'Debe seleccionar al menos un curso.'
+      return
+    }
+
+    if (!assignmentPeriod.value) {
+      assignError.value = 'No se pudo determinar el período actual.'
+      return
+    }
+
+    assignLoading.value = true
     try {
-        if (isAssigned(course.id)) {
-            console.log("Quitando curso:", course.name, "al profesor:", selectedProfessor.value.id)
-        } else {
-            console.log("Asignando curso:", course.name, "al profesor:", selectedProfessor.value.id)
+        const payload = {
+            professorId: assignmentProfessorId.value,
+            courseCodes: assignmentCourseIds.value,
+            period: assignmentPeriod.value,
         }
+
+        await adminService.assignCourses(payload)
+        assignSuccess.value = 'Cursos asignados correctamente.'
+        assignmentProfessorId.value = null
+        assignmentCourseIds.value = []
+        assignmentPeriod.value = getCurrentAcademicPeriod()
+        await fetchAssignments()
+    } catch (error: any) {
+        console.error('Error al asignar cursos:', error)
+        assignError.value = error?.response?.data?.message || 'No se pudieron asignar los cursos.'
     } finally {
-        actionLoading.value = null
+        assignLoading.value = false
     }
 }
 
@@ -87,12 +225,15 @@ const filteredProfessors = computed(() => {
     const s = searchQuery.value.toLowerCase().trim()
     if (!s) return professors.value
     return professors.value.filter(p =>
-        p.fullName.toLowerCase().includes(s) || 
+        p.fullName.toLowerCase().includes(s) ||
         p.email.toLowerCase().includes(s)
     )
 })
 
-onMounted(fetchAssignments)
+onMounted(async () => {
+  assignmentPeriod.value = getCurrentAcademicPeriod()
+  await Promise.all([fetchAssignments(), fetchAllCourses()])
+})
 </script>
 
 <template>
@@ -106,26 +247,80 @@ onMounted(fetchAssignments)
             <v-btn icon="mdi-refresh" variant="tonal" color="primary" @click="fetchAssignments" :loading="loading"></v-btn>
         </div>
 
-        <v-text-field 
-            v-model="searchQuery" 
-            prepend-inner-icon="mdi-magnify" 
+
+        <v-text-field
+            v-model="searchQuery"
+            prepend-inner-icon="mdi-magnify"
             label="Buscar por nombre o correo del docente..."
-            variant="outlined" 
-            rounded="lg" 
-            class="mb-6 bg-white" 
-            hide-details 
+            variant="outlined"
+            rounded="lg"
+            class="mb-6 bg-white"
+            hide-details
             clearable
         ></v-text-field>
 
+        <v-card class="mb-6 pa-4" rounded="lg" border flat>
+            <v-row>
+                <v-col cols="12" md="4">
+                    <v-select
+                        v-model="assignmentProfessorId"
+                        :items="availableProfessors"
+                        label="Seleccionar docente"
+                        variant="outlined"
+                    />
+                </v-col>
+
+              <v-col cols="12" md="4">
+                <v-select
+                    v-model="assignmentCourseIds"
+                    :items="availableCourses"
+                    label="Seleccionar cursos"
+                    variant="outlined"
+                    multiple
+                    chips
+                />
+              </v-col>
+
+                <v-col cols="12" md="2">
+                  <v-text-field
+                      v-model="assignmentPeriod"
+                      label="Período"
+                      variant="outlined"
+                      readonly
+                  />
+                </v-col>
+
+                <v-col cols="12" md="2" class="d-flex align-end">
+                    <v-btn
+                        color="primary"
+                        block
+                        :loading="assignLoading"
+                        @click="handleAssignCourses"
+                    >
+                        Guardar
+                    </v-btn>
+                </v-col>
+            </v-row>
+
+            <v-alert v-if="assignError" type="error" class="mt-3">
+                {{ assignError }}
+            </v-alert>
+
+            <v-alert v-if="assignSuccess" type="success" class="mt-3">
+                {{ assignSuccess }}
+            </v-alert>
+        </v-card>
+
         <v-card border flat rounded="lg">
-            <v-data-table 
-                v-model:expanded="expanded"
-                :headers="headers" 
-                :items="filteredProfessors" 
-                :search="searchQuery"
-                item-value="id"
-                show-expand
-            >
+          <v-data-table
+              :key="tableRefreshKey"
+              v-model:expanded="expanded"
+              :headers="headers"
+              :items="filteredProfessors"
+              :search="searchQuery"
+              item-value="id"
+              show-expand
+          >
                 <template v-slot:item.coursesCount="{ item }">
                     <v-chip size="small" :color="item.coursesCount > 0 ? 'primary' : 'grey'">
                         {{ item.coursesCount }} Cursos
@@ -169,42 +364,45 @@ onMounted(fetchAssignments)
                         <div class="text-caption" style="opacity: 0.8">Docente: {{ selectedProfessor?.fullName }}</div>
                     </div>
                     <v-spacer></v-spacer>
-                    <v-btn icon="mdi-close" variant="text" color="white" @click="isAssignDialogOpen = false"></v-btn>
+                    <v-btn icon="mdi-close" variant="text" color="white" @click="closeAssignDialog"></v-btn>
                 </v-card-title>
 
                 <v-card-text class="pa-0">
                     <div class="pa-4 bg-grey-lighten-4">
-                        <v-text-field 
-                            v-model="courseSearchQuery" 
+                        <v-text-field
+                            v-model="courseSearchQuery"
                             placeholder="Buscar curso por nombre o código..."
-                            variant="solo" 
-                            density="compact" 
-                            prepend-inner-icon="mdi-filter-variant" 
+                            variant="solo"
+                            density="compact"
+                            prepend-inner-icon="mdi-filter-variant"
                             hide-details
                             flat
                         ></v-text-field>
                     </div>
 
-                    <v-data-table 
-                        :headers="courseHeaders" 
-                        :items="allCourses" 
+                    <v-data-table
+                        :headers="courseHeaders"
+                        :items="allCourses"
                         :loading="dialogLoading"
                         :search="courseSearchQuery"
-                        item-value="id" 
-                        density="comfortable" 
+                        item-value="code"
+                        density="comfortable"
                         height="350px"
                         fixed-header
                     >
                         <template v-slot:item.action="{ item }">
-                            <v-btn 
-                                :color="isAssigned(item.id) ? 'error' : 'success'" 
-                                :variant="isAssigned(item.id) ? 'tonal' : 'elevated'" 
+                            <v-btn
+                                :key="`${item.code}-${isAssigned(item.code)}`"
+                                :color="isAssigned(item.code) ? 'error' : 'success'"
+                                :variant="isAssigned(item.code) ? 'tonal' : 'elevated'"
                                 size="x-small"
-                                :loading="actionLoading === item.id" 
+                                :loading="actionLoading === item.code"
                                 @click="handleToggleCourse(item)"
-                                :prepend-icon="isAssigned(item.id) ? 'mdi-minus' : 'mdi-plus'"
                             >
-                                {{ isAssigned(item.id) ? 'Quitar' : 'Asignar' }}
+                                <v-icon start>
+                                    {{ isAssigned(item.code) ? 'mdi-minus' : 'mdi-plus' }}
+                                </v-icon>
+                                {{ isAssigned(item.code) ? 'Quitar' : 'Asignar' }}
                             </v-btn>
                         </template>
 
@@ -215,13 +413,6 @@ onMounted(fetchAssignments)
                 </v-card-text>
 
                 <v-divider></v-divider>
-                <v-card-actions class="pa-4">
-                    <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="isAssignDialogOpen = false">Cancelar</v-btn>
-                    <v-btn color="primary" variant="flat" rounded="lg" width="120" @click="isAssignDialogOpen = false">
-                        Listo
-                    </v-btn>
-                </v-card-actions>
             </v-card>
         </v-dialog>
     </v-container>
