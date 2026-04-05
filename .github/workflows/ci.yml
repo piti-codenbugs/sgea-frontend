@@ -24,6 +24,9 @@ jobs:
       - name: Lint code
         run: npm run lint
 
+      - name: Type check
+        run: npx vue-tsc --noEmit
+
       - name: Build app
         run: npm run build
         env:
