@@ -11,7 +11,6 @@ describe('Gestión de Cursos - Asignación a Docentes', () => {
 
         cy.intercept('POST', '**/login').as('loginRequest')
 
-        // Ajusta esta ruta si tu backend usa otra para docentes aprobados
         cy.intercept('GET', '**/api/v1/professor?status=APROBADO').as('getApprovedProfessors')
 
         cy.intercept('GET', '**/api/v1/course-assignment/assignments').as('getAssignments')
