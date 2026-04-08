@@ -6,7 +6,7 @@ const professors = ref<any[]>([])
 const allCourses = ref<any[]>([]) 
 const loading = ref(false)
 const searchQuery = ref('')
-const expanded = ref<number[]>([])
+const expanded = ref<string[]>([])
 const tableRefreshKey = ref(0)
 
 const assignmentProfessorId = ref<number | null>(null)
@@ -244,11 +244,12 @@ onMounted(async () => {
                 <p class="text-subtitle-1 text-grey">Gestiona la carga académica de los docentes</p>
             </div>
             <v-spacer></v-spacer>
-            <v-btn icon="mdi-refresh" variant="tonal" color="primary" @click="fetchAssignments" :loading="loading"></v-btn>
+            <v-btn data-cy="assignments-refresh-button" icon="mdi-refresh" variant="tonal" color="primary" @click="fetchAssignments" :loading="loading"></v-btn>
         </div>
 
 
         <v-text-field
+            data-cy="assignments-search-input"
             v-model="searchQuery"
             prepend-inner-icon="mdi-magnify"
             label="Buscar por nombre o correo del docente..."
@@ -263,6 +264,7 @@ onMounted(async () => {
             <v-row>
                 <v-col cols="12" md="4">
                     <v-select
+                        data-cy="assignment-professor-select"
                         v-model="assignmentProfessorId"
                         :items="availableProfessors"
                         label="Seleccionar docente"
@@ -272,6 +274,7 @@ onMounted(async () => {
 
               <v-col cols="12" md="4">
                 <v-select
+                    data-cy="assignment-courses-select"
                     v-model="assignmentCourseIds"
                     :items="availableCourses"
                     label="Seleccionar cursos"
@@ -283,6 +286,7 @@ onMounted(async () => {
 
                 <v-col cols="12" md="2">
                   <v-text-field
+                      data-cy="assignment-period-input"
                       v-model="assignmentPeriod"
                       label="Período"
                       variant="outlined"
@@ -292,6 +296,7 @@ onMounted(async () => {
 
                 <v-col cols="12" md="2" class="d-flex align-end">
                     <v-btn
+                        data-cy="assignment-save-button"
                         color="primary"
                         block
                         :loading="assignLoading"
@@ -302,17 +307,18 @@ onMounted(async () => {
                 </v-col>
             </v-row>
 
-            <v-alert v-if="assignError" type="error" class="mt-3">
+            <v-alert v-if="assignError" data-cy="assignment-error-alert" type="error" class="mt-3">
                 {{ assignError }}
             </v-alert>
 
-            <v-alert v-if="assignSuccess" type="success" class="mt-3">
+            <v-alert v-if="assignSuccess" data-cy="assignment-success-alert" type="success" class="mt-3">
                 {{ assignSuccess }}
             </v-alert>
         </v-card>
 
         <v-card border flat rounded="lg">
           <v-data-table
+              data-cy="professors-assignments-table"
               :key="tableRefreshKey"
               v-model:expanded="expanded"
               :headers="headers"
@@ -328,7 +334,7 @@ onMounted(async () => {
                 </template>
 
                 <template v-slot:item.actions="{ item }">
-                    <v-btn size="small" variant="elevated" color="primary" prepend-icon="mdi-account-edit"
+                    <v-btn data-cy="manage-professor-courses-button" size="small" variant="elevated" color="primary" prepend-icon="mdi-account-edit"
                         @click="openAssignDialog(item)">
                         Gestionar
                     </v-btn>
@@ -341,7 +347,7 @@ onMounted(async () => {
                                 <p class="text-caption font-weight-bold mb-2">CURSOS ACTUALES:</p>
                                 <v-row>
                                     <v-col v-for="c in item.courses" :key="c.id" cols="12" md="4">
-                                        <v-card border flat class="pa-2 d-flex align-center rounded-lg bg-white">
+                                        <v-card :data-cy="`professor-course-card-${c.code}`" border flat class="pa-2 d-flex align-center rounded-lg bg-white">
                                             <v-icon color="secondary" size="small" class="mr-2">mdi-book-open-variant</v-icon>
                                             <span class="text-caption font-weight-bold">{{ c.name }}</span>
                                         </v-card>
@@ -355,7 +361,7 @@ onMounted(async () => {
             </v-data-table>
         </v-card>
 
-        <v-dialog v-model="isAssignDialogOpen" max-width="650px" scrollable>
+        <v-dialog data-cy="assign-dialog" v-model="isAssignDialogOpen" max-width="650px" scrollable>
             <v-card rounded="xl">
                 <v-card-title class="pa-4 d-flex align-center bg-primary text-white">
                     <v-icon start>mdi-book-multiple</v-icon>
@@ -364,12 +370,13 @@ onMounted(async () => {
                         <div class="text-caption" style="opacity: 0.8">Docente: {{ selectedProfessor?.fullName }}</div>
                     </div>
                     <v-spacer></v-spacer>
-                    <v-btn icon="mdi-close" variant="text" color="white" @click="closeAssignDialog"></v-btn>
+                    <v-btn data-cy="assign-dialog-close-button" icon="mdi-close" variant="text" color="white" @click="closeAssignDialog"></v-btn>
                 </v-card-title>
 
                 <v-card-text class="pa-0">
                     <div class="pa-4 bg-grey-lighten-4">
                         <v-text-field
+                            data-cy="assign-dialog-search-input"
                             v-model="courseSearchQuery"
                             placeholder="Buscar curso por nombre o código..."
                             variant="solo"
@@ -381,6 +388,7 @@ onMounted(async () => {
                     </div>
 
                     <v-data-table
+                        data-cy="assign-dialog-courses-table"
                         :headers="courseHeaders"
                         :items="allCourses"
                         :loading="dialogLoading"
@@ -392,6 +400,7 @@ onMounted(async () => {
                     >
                         <template v-slot:item.action="{ item }">
                             <v-btn
+                                :data-cy="`toggle-course-button-${item.code}`"
                                 :key="`${item.code}-${isAssigned(item.code)}`"
                                 :color="isAssigned(item.code) ? 'error' : 'success'"
                                 :variant="isAssigned(item.code) ? 'tonal' : 'elevated'"

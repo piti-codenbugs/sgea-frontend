@@ -155,15 +155,15 @@ const submitApprove = async () => {
 
 <template>
   <v-container class="py-8">
-    <v-btn variant="text" prepend-icon="mdi-arrow-left" @click="goBack" class="mb-4">
+    <v-btn data-cy="back-to-pending-button" variant="text" prepend-icon="mdi-arrow-left" @click="goBack" class="mb-4">
       Volver a pendientes
     </v-btn>
 
-    <v-alert v-if="error" type="error" class="mb-4" dismissible>
+    <v-alert data-cy="review-error-alert" v-if="error" type="error" class="mb-4" dismissible>
       {{ error }}
     </v-alert>
 
-    <v-alert v-if="success" type="success" class="mb-4" dismissible>
+    <v-alert data-cy="review-success-alert" v-if="success" type="success" class="mb-4" dismissible>
       {{ success }}
     </v-alert>
 
@@ -171,7 +171,7 @@ const submitApprove = async () => {
 
     <v-row v-if="request && !loading">
       <v-col cols="12" lg="8">
-        <v-card>
+        <v-card data-cy="equivalency-review-card">
           <v-card-title class="text-h5 font-weight-bold d-flex justify-space-between align-center">
             <span>Revisión de Solicitud #{{ request.id }}</span>
             <v-chip :color="getStatusColor(request.status)" text-color="white" size="large">
@@ -240,7 +240,7 @@ const submitApprove = async () => {
                 <v-card variant="outlined" class="pa-4 h-100">
                   <div class="text-subtitle-2 font-weight-bold">Programa del Curso</div>
                   <div class="text-caption text-secondary mb-3">Archivo enviado por estudiante</div>
-                  <v-btn block color="primary" variant="tonal" @click="openPdfInNewTab(request.programUrl)">
+                  <v-btn data-cy="view-program-pdf-button" block color="primary" variant="tonal" @click="openPdfInNewTab(request.programUrl)">
                     <v-icon start>mdi-eye</v-icon>
                     Ver PDF
                   </v-btn>
@@ -251,7 +251,7 @@ const submitApprove = async () => {
                 <v-card variant="outlined" class="pa-4 h-100">
                   <div class="text-subtitle-2 font-weight-bold">Constancia de Cursos</div>
                   <div class="text-caption text-secondary mb-3">Archivo enviado por estudiante</div>
-                  <v-btn block color="primary" variant="tonal" @click="openPdfInNewTab(request.courseCertificateUrl)">
+                  <v-btn data-cy="view-certificate-pdf-button" block color="primary" variant="tonal" @click="openPdfInNewTab(request.courseCertificateUrl)">
                     <v-icon start>mdi-eye</v-icon>
                     Ver PDF
                   </v-btn>
@@ -262,7 +262,7 @@ const submitApprove = async () => {
                 <v-card variant="outlined" class="pa-4">
                   <div class="text-subtitle-2 font-weight-bold">Programa Firmado</div>
                   <div class="text-caption text-secondary mb-3">Documento de resolución</div>
-                  <v-btn color="primary" variant="tonal" @click="openPdfInNewTab(request.signedProgramUrl)">
+                  <v-btn data-cy="view-signed-pdf-button" color="primary" variant="tonal" @click="openPdfInNewTab(request.signedProgramUrl)">
                     <v-icon start>mdi-eye</v-icon>
                     Ver PDF firmado
                   </v-btn>
@@ -289,11 +289,11 @@ const submitApprove = async () => {
 
             <template v-else>
               <div class="d-flex flex-column ga-3 mb-4">
-                <v-btn color="error" variant="tonal" block @click="selectRejectMode">
+                <v-btn data-cy="reject-button" color="error" variant="tonal" block @click="selectRejectMode">
                   <v-icon start>mdi-close-circle-outline</v-icon>
                   Rechazar
                 </v-btn>
-                <v-btn color="success" variant="tonal" block @click="selectApproveMode">
+                <v-btn data-cy="approve-button" color="success" variant="tonal" block @click="selectApproveMode">
                   <v-icon start>mdi-check-circle-outline</v-icon>
                   Aprobar
                 </v-btn>
@@ -305,6 +305,7 @@ const submitApprove = async () => {
 
               <div v-if="actionMode === 'reject'">
                 <v-textarea
+                    data-cy="reject-comment-input"
                   v-model="rejectComment"
                   label="Motivo de rechazo"
                   placeholder="Describe claramente por qué se rechaza la solicitud"
@@ -315,6 +316,7 @@ const submitApprove = async () => {
                 />
 
                 <v-btn
+                    data-cy="confirm-reject-button"
                   color="error"
                   block
                   :loading="submitting"
@@ -334,7 +336,8 @@ const submitApprove = async () => {
                 </v-alert>
 
                 <v-card v-if="privatePrograms.length > 0" variant="outlined" class="mb-4">
-                  <v-table density="compact">
+                  <v-table
+                      data-cy="private-programs-table" density="compact">
                     <thead>
                       <tr>
                         <th>Curso origen</th>
@@ -365,6 +368,7 @@ const submitApprove = async () => {
                             :color="selectedPrivateProgram?.id === program.id ? 'success' : 'primary'"
                             :variant="selectedPrivateProgram?.id === program.id ? 'flat' : 'tonal'"
                             @click="selectedPrivateProgram = program"
+                            :data-cy="`select-program-${program.id}`"
                           >
                             {{ selectedPrivateProgram?.id === program.id ? 'Seleccionado' : 'Seleccionar' }}
                           </v-btn>
@@ -375,6 +379,7 @@ const submitApprove = async () => {
                 </v-card>
 
                 <v-file-input
+                    data-cy="upload-signed-program"
                   v-if="privatePrograms.length === 0"
                   v-model="signedProgramFile"
                   label="Subir programa firmado (PDF)"
@@ -391,6 +396,7 @@ const submitApprove = async () => {
                 </v-alert>
 
                 <v-btn
+                    data-cy="confirm-approve-button"
                   color="success"
                   block
                   :loading="submitting"
