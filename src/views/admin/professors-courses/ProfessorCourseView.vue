@@ -6,7 +6,7 @@ const professors = ref<any[]>([])
 const allCourses = ref<any[]>([]) 
 const loading = ref(false)
 const searchQuery = ref('')
-const expanded = ref<number[]>([])
+const expanded = ref<string[]>([])
 const tableRefreshKey = ref(0)
 
 const assignmentProfessorId = ref<number | null>(null)

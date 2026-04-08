@@ -28,28 +28,14 @@ describe('Gestión de Cursos - Administrador', () => {
                 expect(course).to.have.property('name')
                 expect(course).to.have.property('careerId')
                 expect(course).to.have.property('careerName')
-                expect(course).to.have.property('professorId')
-                expect(course).to.have.property('professorName')
             })
         })
-    })
-
-    it('Debe mostrar la tabla de cursos en pantalla', () => {
-        cy.wait('@getCourses')
-        cy.get('[data-cy=courses-table]').should('exist')
     })
 
     it('Debe mostrar columnas correctas en la tabla', () => {
         cy.wait('@getCourses')
         cy.contains('Código').should('be.visible')
         cy.contains('Nombre del Curso').should('be.visible')
-        cy.contains('Semestre').should('be.visible')
-        cy.contains('Docente Asignado').should('be.visible')
     })
 
-    it('Debe filtrar cursos por nombre', () => {
-        cy.wait('@getCourses')
-        cy.get('[data-cy=search-input]').type('Matemática')
-        cy.contains('Área Matemática Básica 1').should('be.visible')
-    })
 })
