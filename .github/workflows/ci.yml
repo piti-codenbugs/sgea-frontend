@@ -1,41 +1,30 @@
 name: CI Frontend
-
 on:
   pull_request:
     branches: [ main, develop, qa ]
-
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install deps
         run: npm ci
-
       - name: Build app
         run: npm run build
         env:
-          VITE_API_URL: {{secrets.VITE_API_URL}}
-
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       - name: Start app
         run: npm run preview &
-
       - name: Wait for app
         run: npx wait-on http://localhost:4173 --timeout 60000
-
       - name: Run Cypress
         run: npx cypress run
         env:
           CYPRESS_BASE_URL: http://localhost:4173
-
-          CYPRESS_STUDENT_EMAIL: {{secrets.CYPRESS_STUDENT_EMAIL}}
-          CYPRESS_STUDENT_PASSWORD: {{secrets.CYPRESS_STUDENT_PASSWORD}}
-
-          CYPRESS_PROFESSOR_EMAIL: {{secrets.CYPRESS_PROFESSOR_EMAIL}}
-          CYPRESS_PROFESSOR_PASSWORD: {{secrets.CYPRESS_PROFESSOR_PASSWORD}}
-
-          CYPRESS_ADMIN_EMAIL: {{secrets.CYPRESS_ADMIN_EMAIL}}
-          CYPRESS_ADMIN_PASSWORD: {{secrets.CYPRESS_ADMIN_PASSWORD}}
+          CYPRESS_STUDENT_EMAIL: ${{ secrets.CYPRESS_STUDENT_EMAIL }}
+          CYPRESS_STUDENT_PASSWORD: ${{ secrets.CYPRESS_STUDENT_PASSWORD }}
+          CYPRESS_PROFESSOR_EMAIL: ${{ secrets.CYPRESS_PROFESSOR_EMAIL }}
+          CYPRESS_PROFESSOR_PASSWORD: ${{ secrets.CYPRESS_PROFESSOR_PASSWORD }}
+          CYPRESS_ADMIN_EMAIL: ${{ secrets.CYPRESS_ADMIN_EMAIL }}
+          CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
