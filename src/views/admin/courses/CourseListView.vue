@@ -110,47 +110,47 @@ onMounted(loadData)
     <div class="d-flex align-center mb-6">
       <h1 class="text-h4 font-weight-bold text-primary">Gestión de Cursos</h1>
       <v-spacer></v-spacer>
-      <v-btn icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
+      <v-btn data-cy="course-list-refresh-button" icon="mdi-refresh" @click="loadData" :loading="loading" color="primary" variant="tonal"></v-btn>
     </div>
 
-    <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar curso..." variant="outlined"
+    <v-text-field data-cy="course-list-search-input" v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar curso..." variant="outlined"
       rounded="lg" class="mb-6 bg-white" hide-details clearable></v-text-field>
 
     <v-card border flat rounded="lg">
-      <v-data-table :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
+      <v-data-table data-cy="course-list-table" :headers="headers" :items="courses" :search="searchQuery" :loading="loading" hover>
 
         <template v-slot:item.professorName="{ item }">
           <div class="d-flex align-center">
             <span :class="!item.professorId ? 'text-grey italic' : ''">
               {{ getProfessorName(item.professorId) }}
             </span>
-            <v-btn icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
+            <v-btn :data-cy="`open-teacher-picker-button-${item.code}`" icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
               @click="openTeacherPicker(item)"></v-btn>
           </div>
         </template>
 
         <template v-slot:item.actions="{ item }">
-          <v-btn icon="mdi-pencil" color="primary" variant="text" @click="openEdit(item)"></v-btn>
+          <v-btn :data-cy="`edit-course-button-${item.code}`" icon="mdi-pencil" color="primary" variant="text" @click="openEdit(item)"></v-btn>
         </template>
       </v-data-table>
     </v-card>
 
-    <v-dialog v-model="teacherDialog" max-width="500">
+    <v-dialog data-cy="teacher-picker-dialog" v-model="teacherDialog" max-width="500">
       <v-card rounded="xl" class="pa-4">
         <v-card-title class="d-flex align-center">
           <span class="text-h5">Asignar Docente</span>
           <v-spacer></v-spacer>
-          <v-btn icon="mdi-close" variant="text" @click="teacherDialog = false"></v-btn>
+          <v-btn data-cy="teacher-picker-close-button" icon="mdi-close" variant="text" @click="teacherDialog = false"></v-btn>
         </v-card-title>
 
         <v-card-text>
-          <v-text-field v-model="teacherSearch" prepend-inner-icon="mdi-magnify" label="Buscar por nombre..."
+          <v-text-field data-cy="teacher-search-input" v-model="teacherSearch" prepend-inner-icon="mdi-magnify" label="Buscar por nombre..."
             variant="filled" density="compact" class="mb-4" hide-details></v-text-field>
 
-          <v-data-table :headers="teacherHeaders" :items="filteredTeachers" density="compact" height="300" fixed-header
+          <v-data-table data-cy="teacher-picker-table" :headers="teacherHeaders" :items="filteredTeachers" density="compact" height="300" fixed-header
             no-data-text="No se encontraron docentes" hide-default-footer>
             <template v-slot:item.action="{ item }">
-              <v-btn color="success" size="small" variant="tonal" @click="selectTeacher(item)">
+              <v-btn :data-cy="`select-teacher-button-${item.id}`" color="success" size="small" variant="tonal" @click="selectTeacher(item)">
                 Seleccionar
               </v-btn>
             </template>
