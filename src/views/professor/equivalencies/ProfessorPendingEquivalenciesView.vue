@@ -72,15 +72,16 @@ onMounted(loadPendingRequests)
     <div class="d-flex align-center mb-6">
       <h1 class="text-h4 font-weight-bold text-primary">Solicitudes de Equivalencia Pendientes</h1>
       <v-spacer></v-spacer>
-      <v-btn icon="mdi-refresh" @click="loadPendingRequests" :loading="loading" color="primary" variant="tonal" />
+      <v-btn data-cy="equivalencies-refresh-button" icon="mdi-refresh" @click="loadPendingRequests" :loading="loading" color="primary" variant="tonal" />
     </div>
 
-    <v-alert v-if="error" type="error" class="mb-4" dismissible>
+    <v-alert data-cy="pending-equivalencies-error" v-if="error" type="error" class="mb-4" dismissible>
       {{ error }}
     </v-alert>
 
     <v-card border flat rounded="lg">
       <v-data-table
+        data-cy="pending-equivalencies-table"
         :headers="headers"
         :items="requests"
         :loading="loading"
@@ -106,7 +107,13 @@ onMounted(loadPendingRequests)
         </template>
 
         <template #item.actions="{ item }">
-          <v-btn size="small" color="primary" variant="tonal" @click="goToReview(item.id)">
+          <v-btn
+            data-cy="view-equivalency-button"
+            size="small"
+            color="primary"
+            variant="tonal"
+            @click="goToReview(item.id)"
+          >
             <v-icon start>mdi-eye</v-icon>
             Ver más
           </v-btn>

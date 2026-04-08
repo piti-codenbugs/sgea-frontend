@@ -12,20 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
       - name: Install deps
         run: npm ci
 
       - name: Build app
         run: npm run build
         env:
-          VITE_API_URL: {{secrets.VITE_API_URL}}
-
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       - name: Start app
         run: npm run preview &
 
@@ -36,12 +29,9 @@ jobs:
         run: npx cypress run
         env:
           CYPRESS_BASE_URL: http://localhost:4173
-
-          CYPRESS_STUDENT_EMAIL: {{secrets.CYPRESS_STUDENT_EMAIL}}
-          CYPRESS_STUDENT_PASSWORD: {{secrets.CYPRESS_STUDENT_PASSWORD}}
-
-          CYPRESS_PROFESSOR_EMAIL: {{secrets.CYPRESS_PROFESSOR_EMAIL}}
-          CYPRESS_PROFESSOR_PASSWORD: {{secrets.CYPRESS_PROFESSOR_PASSWORD}}
-
-          CYPRESS_ADMIN_EMAIL: {{secrets.CYPRESS_ADMIN_EMAIL}}
-          CYPRESS_ADMIN_PASSWORD: {{secrets.CYPRESS_ADMIN_PASSWORD}}
+          CYPRESS_STUDENT_EMAIL: ${{ secrets.CYPRESS_STUDENT_EMAIL }}
+          CYPRESS_STUDENT_PASSWORD: ${{ secrets.CYPRESS_STUDENT_PASSWORD }}
+          CYPRESS_PROFESSOR_EMAIL: ${{ secrets.CYPRESS_PROFESSOR_EMAIL }}
+          CYPRESS_PROFESSOR_PASSWORD: ${{ secrets.CYPRESS_PROFESSOR_PASSWORD }}
+          CYPRESS_ADMIN_EMAIL: ${{ secrets.CYPRESS_ADMIN_EMAIL }}
+          CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
