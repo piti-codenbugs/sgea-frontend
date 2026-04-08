@@ -18,7 +18,7 @@ jobs:
       - name: Build app
         run: npm run build
         env:
-          VITE_API_URL: https://sgea-backend-production.up.railway.app/api/v1
+          VITE_API_URL: {{secrets.VITE_API_URL}}
 
       - name: Start app
         run: npm run preview &
@@ -30,9 +30,12 @@ jobs:
         run: npx cypress run
         env:
           CYPRESS_BASE_URL: http://localhost:4173
-          CYPRESS_STUDENT_EMAIL: estudiante1@test.com
-          CYPRESS_STUDENT_PASSWORD: contraseñaAdmin01
-          CYPRESS_PROFESSOR_EMAIL: docente1@test.com
-          CYPRESS_PROFESSOR_PASSWORD: contraseñaAdmin01
-          CYPRESS_ADMIN_EMAIL: admin1@test.com
-          CYPRESS_ADMIN_PASSWORD: contraseñaAdmin01
+
+          CYPRESS_STUDENT_EMAIL: {{secrets.CYPRESS_STUDENT_EMAIL}}
+          CYPRESS_STUDENT_PASSWORD: {{secrets.CYPRESS_STUDENT_PASSWORD}}
+
+          CYPRESS_PROFESSOR_EMAIL: {{secrets.CYPRESS_PROFESSOR_EMAIL}}
+          CYPRESS_PROFESSOR_PASSWORD: {{secrets.CYPRESS_PROFESSOR_PASSWORD}}
+
+          CYPRESS_ADMIN_EMAIL: {{secrets.CYPRESS_ADMIN_EMAIL}}
+          CYPRESS_ADMIN_PASSWORD: {{secrets.CYPRESS_ADMIN_PASSWORD}}
