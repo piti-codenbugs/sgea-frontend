@@ -1,0 +1,21 @@
+1. assets -> imagenes, iconos
+2. components -> componentes reutilizables
+		common -> botones, dialogos, loaders
+		layout -> navbar, sidebar, footer
+		modules -> tablas, forms, cards
+3. layouts -> estructuras base
+4. plugins -> 
+5. router -> rutas de la app
+6. services -> llamadas a la API
+7. stores -> usuario autenticado, sesion, permisos
+8. styles -> estilos globales
+9. views -> vistas
+
+
+login -> correo, contraseña
+registroEstudiante -> userName, lastName, email, password, role
+registroProfesor -> userName, lastName, email, password, role
+
+
+dependencias:
+npm add axios pinia (axios: realiza peticiones http, pinia: guarda y gestiona datos en la memoria de la app)
