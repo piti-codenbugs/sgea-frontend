@@ -65,17 +65,21 @@ const handleLogout = () => {
           </v-list-item>
 
           <v-divider></v-divider>
-
+        <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi perfil" :to="{ name: 'student-profile' }"></v-list-item>
           <v-list-item prepend-icon="mdi-logout" title="Cerrar sesión" color="error" @click="handleLogout"></v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar>
 
     <v-main class="student-shell">
-      <v-container fluid class="pa-4 pa-md-6 student-shell__content">
+  <v-container fluid class="pa-4 pa-md-6 d-flex flex-column align-center" style="min-height: 100%;">
+    <v-row justify="center" style="width: 100%; max-width: 1280px;">
+      <v-col cols="12">
         <router-view />
-      </v-container>
-    </v-main>
+      </v-col>
+    </v-row>
+  </v-container>
+</v-main>
   </v-app>
 </template>
 

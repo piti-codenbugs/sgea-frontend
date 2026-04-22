@@ -29,3 +29,19 @@ export async function registerProfessor(payload: RegisterProfessorRequestDto): P
     const {data} = await api.post<AuthResponseDto>('/auth/register-professor', payload)
     return data
 }
+export async function updateProfile(payload: {
+    firstName: string
+    lastName: string
+    password?: string
+}): Promise<{ firstName: string; lastName: string; email: string }> {
+    const { data } = await api.put('/usuarios/profile', payload)
+    return data
+}
+
+/**
+ * obtiene el perfil del usuario autenticado
+ */
+export async function getProfile(): Promise<{ firstName: string; lastName: string; email: string }> {
+    const { data } = await api.get('/usuarios/profile')
+    return data
+}

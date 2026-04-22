@@ -40,6 +40,11 @@ const routes = [
                 path: 'equivalencies/:id',
                 name: 'student-equivalency-detail',
                 component: () => import('@/views/student/equivalencies/StudentEquivalencyDetailView.vue')
+            },
+            {
+                path: 'profile',
+                name: 'student-profile',
+                component: () => import('@/views/profile/ProfileView.vue')
             }
         ],
         meta: { requiresAuth: true, role: 'ROLE_STUDENT' }
@@ -67,6 +72,11 @@ const routes = [
                 path: 'equivalencies/:id',
                 name: 'professor-equivalency-review',
                 component: () => import('@/views/professor/equivalencies/ProfessorEquivalencyReviewView.vue')
+            },
+            {
+                path: 'profile',
+                name: 'professor-profile',
+                component: () => import('@/views/profile/ProfileView.vue')
             }
         ],
         meta: { requiresAuth: true, role: 'ROLE_PROFESSOR' }
@@ -89,6 +99,11 @@ const routes = [
                 path: 'professors-courses',
                 name: 'admin-professors-courses',
                 component: () => import('@/views/admin/professors-courses/ProfessorCourseView.vue')
+            },
+            {
+                path: 'profile',
+                name: 'admin-profile',
+                component: () => import('@/views/profile/ProfileView.vue')
             }
         ],
         meta: { requiresAuth: true, role: 'ROLE_ADMIN' }

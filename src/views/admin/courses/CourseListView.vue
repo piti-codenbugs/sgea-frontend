@@ -124,8 +124,8 @@ onMounted(loadData)
             <span :class="!item.professorId ? 'text-grey italic' : ''">
               {{ getProfessorName(item.professorId) }}
             </span>
-            <v-btn :data-cy="`open-teacher-picker-button-${item.code}`" icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
-              @click="openTeacherPicker(item)"></v-btn>
+            <!-- <v-btn :data-cy="`open-teacher-picker-button-${item.code}`" icon="mdi-account-search" size="small" variant="text" color="primary" class="ml-2"
+              @click="openTeacherPicker(item)"></v-btn> -->
           </div>
         </template>
 
