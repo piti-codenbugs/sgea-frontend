@@ -70,7 +70,7 @@ const handleLogout = () => {
                     </div>
 
                     <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi perfil"
-                        to="/admin/profile"></v-list-item>
+                        :to="{ name: 'admin-profile' }"></v-list-item>
 
                     <v-divider class="my-2"></v-divider>
 
@@ -81,9 +81,13 @@ const handleLogout = () => {
         </v-app-bar>
 
         <v-main class="bg-grey-lighten-4">
-            <v-container fluid class="pa-4 pa-md-6">
+        <v-container fluid class="pa-4 pa-md-6 d-flex flex-column align-center" style="min-height: 100%;">
+            <v-row justify="center" style="width: 100%; max-width: 1400px;">
+            <v-col cols="12">
                 <router-view />
-            </v-container>
+            </v-col>
+            </v-row>
+        </v-container>
         </v-main>
     </v-app>
 </template>
