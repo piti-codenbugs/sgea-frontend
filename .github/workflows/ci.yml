@@ -21,9 +21,6 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      #- name: Lint code
-      #  run: npm run lint
-
       - name: Type check
         run: npx vue-tsc --noEmit
 
