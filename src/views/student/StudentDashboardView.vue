@@ -72,10 +72,14 @@ const handleLogout = () => {
     </v-app-bar>
 
     <v-main class="student-shell">
-      <v-container fluid class="pa-4 pa-md-6 student-shell__content">
+  <v-container fluid class="pa-4 pa-md-6 d-flex flex-column align-center" style="min-height: 100%;">
+    <v-row justify="center" style="width: 100%; max-width: 1280px;">
+      <v-col cols="12">
         <router-view />
-      </v-container>
-    </v-main>
+      </v-col>
+    </v-row>
+  </v-container>
+</v-main>
   </v-app>
 </template>
 
