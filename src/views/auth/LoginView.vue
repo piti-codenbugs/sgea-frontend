@@ -14,7 +14,30 @@ const loading = ref(false)
 
 const icons = ['mdi-github', 'mdi-gmail']
 
+const errors = ref({
+  email: '',
+  password: ''
+})
+
+function validateForm(): boolean {
+  let valid = true
+  errors.value = { email: '', password: '' }
+
+  if (!email.value.trim()) {
+    errors.value.email = 'El correo es obligatorio'
+    valid = false
+  }
+  if (!password.value.trim()) {
+    errors.value.password = 'La contraseña es obligatoria'
+    valid = false
+  }
+
+  return valid
+}
+
+
 async function handleLogin() {
+  if (!validateForm()) return
   loading.value = true
   error.value = ''
 
@@ -67,6 +90,7 @@ async function handleLogin() {
               variant="outlined"
               rounded="lg"
               prepend-inner-icon="mdi-email-outline"
+              :error-messages="errors.email"
               data-cy="email"
             />
 
@@ -78,6 +102,7 @@ async function handleLogin() {
               prepend-inner-icon="mdi-lock-outline"
               :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
+              :error-messages="errors.password"
               @click:append-inner="showPassword = !showPassword"
               data-cy="password"
             />

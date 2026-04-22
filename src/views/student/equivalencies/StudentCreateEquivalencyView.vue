@@ -367,22 +367,38 @@ const professorName = computed(() => {
                             <v-row>
                                 <v-col cols="12" md="6">
                                     <v-text-field v-model="originCourseCode" label="Código del Curso" variant="outlined"
-                                        placeholder="Ej: 101 o MAT-101" required></v-text-field>
+                                        placeholder="Ej: 101 o MAT-101" hint="Obligatorio" persistent-hint required> 
+                                        <template #message>
+                                            <span class="text-error">Obligatorio</span>
+                                        </template>
+                                    </v-text-field>
                                 </v-col>
 
                                 <v-col cols="12" md="6">
                                     <v-text-field v-model.number="year" label="Año que lo Cursó" type="number"
-                                        variant="outlined" required></v-text-field>
+                                        variant="outlined" hint="Obligatorio" persistent-hint required>
+                                        <template #message>
+                                            <span class="text-error">Obligatorio</span>
+                                        </template>
+                                    </v-text-field>
                                 </v-col>
 
                                 <v-col cols="12" md="6">
                                     <v-select v-model.number="semester" :items="[1, 2]" label="Semestre"
-                                        variant="outlined" required></v-select>
+                                        variant="outlined" hint="Obligatorio" persistent-hint required>
+                                        <template #message>
+                                            <span class="text-error">Obligatorio</span>
+                                        </template>
+                                    </v-select>
                                 </v-col>
 
                                 <v-col cols="12" md="6">
                                     <v-text-field v-model="section" label="Sección" variant="outlined"
-                                        placeholder="Ej: 01, A, B" required></v-text-field>
+                                        placeholder="Ej: 01, A, B" hint="Obligatorio" persistent-hint required>
+                                        <template #message>
+                                            <span class="text-error">Obligatorio</span>
+                                        </template>
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
 

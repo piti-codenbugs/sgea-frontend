@@ -23,12 +23,51 @@ const showPassword = ref(false)
 const error = ref('')
 const loading = ref(false)
 
+
 const icons = [
   'mdi-github',
   'mdi-gmail'
 ]
 
+const errors = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  carnet: ''
+})
+
+function validateForm(): boolean {
+  let valid = true
+  errors.value = { firstName: '', lastName: '', email: '', password: '', carnet: '' }
+
+  if (!firstName.value.trim()) {
+    errors.value.firstName = 'Los nombres son obligatorios'
+    valid = false
+  }
+  if (!lastName.value.trim()) {
+    errors.value.lastName = 'Los apellidos son obligatorios'
+    valid = false
+  }
+  if (!email.value.trim()) {
+    errors.value.email = 'El correo es obligatorio'
+    valid = false
+  }
+  if (!password.value.trim()) {
+    errors.value.password = 'La contraseña es obligatoria'
+    valid = false
+  }
+  if (selectedRole.value === 'Estudiante' && !carnet.value.trim()) {
+    errors.value.carnet = 'El carnet es obligatorio'
+    valid = false
+  }
+
+  return valid
+}
+
 async function handleRegister() {
+  if (!validateForm()) return
+
   loading.value = true
   error.value = ''
 
@@ -86,21 +125,23 @@ async function handleRegister() {
             <v-select v-model="selectedRole" :items="['Estudiante', 'Profesor']" label="Seleccione un rol"
                       variant="outlined" prepend-inner-icon="mdi-account" class="mb-3" data-cy="selectedRole"/>
 
-            <v-text-field v-model="firstName" label="Nombres" variant="outlined" prepend-inner-icon="mdi-account"
+            <v-text-field v-model="firstName" label="Nombres *" variant="outlined" prepend-inner-icon="mdi-account":error-messages="errors.firstName"
                           class="mb-3"/>
 
-            <v-text-field v-model="lastName" label="Apellidos" variant="outlined"
+            <v-text-field v-model="lastName" label="Apellidos" variant="outlined" :error-messages="errors.lastName"
                           prepend-inner-icon="mdi-account-outline" class="mb-3"/>
 
-            <v-text-field v-model="email" label="Correo" type="email" variant="outlined" prepend-inner-icon="mdi-email"
+            <v-text-field v-model="email" label="Correo" type="email" variant="outlined" prepend-inner-icon="mdi-email" :error-messages="errors.email"
                           class="mb-3"/>
 
             <v-text-field v-if="selectedRole === 'Estudiante'" v-model="carnet" label="Carnet" variant="outlined"
-                          prepend-inner-icon="mdi-card-account-details" class="mb-3" data-cy="carnet"/>
+                          prepend-inner-icon="mdi-card-account-details" :error-messages="errors.carnet" class="mb-3" data-cy="carnet"/>
 
             <v-text-field v-model="password" label="Contraseña" variant="outlined" prepend-inner-icon="mdi-lock"
                           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                          :type="showPassword ? 'text' : 'password'" @click:append="showPassword = !showPassword"/>
+                          :type="showPassword ? 'text' : 'password'" 
+                            :error-messages="errors.password"
+                          @click:append="showPassword = !showPassword"/>
 
           </v-card-text>
 
