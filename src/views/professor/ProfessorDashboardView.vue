@@ -65,7 +65,7 @@ const handleLogout = () => {
           <v-divider></v-divider>
 
           <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi perfil"
-            to="/professor/profile"></v-list-item>
+            :to="{ name: 'professor-profile' }"></v-list-item>
 
           <v-divider class="my-2"></v-divider>
 

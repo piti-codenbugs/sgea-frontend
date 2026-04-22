@@ -70,7 +70,7 @@ const handleLogout = () => {
                     </div>
 
                     <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi perfil"
-                        to="/admin/profile"></v-list-item>
+                        :to="{ name: 'admin-profile' }"></v-list-item>
 
                     <v-divider class="my-2"></v-divider>
 
