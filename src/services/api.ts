@@ -2,12 +2,12 @@ import axios from 'axios'
 import router from '@/router'
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    //baseURL: import.meta.env.VITE_API_URL,
+    baseURL: "http://localhost:8080/api/v1",
     headers: {
         'Content-Type': 'application/json'
     }
 })
-console.log('API URL:', import.meta.env.VITE_API_URL)
 
 // interceptor de request -> agrega JWT
 api.interceptors.request.use((config) => {
