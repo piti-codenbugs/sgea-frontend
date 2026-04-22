@@ -125,14 +125,14 @@ async function handleRegister() {
             <v-select v-model="selectedRole" :items="['Estudiante', 'Profesor']" label="Seleccione un rol"
                       variant="outlined" prepend-inner-icon="mdi-account" class="mb-3" data-cy="selectedRole"/>
 
-            <v-text-field v-model="firstName" label="Nombres *" variant="outlined" prepend-inner-icon="mdi-account":error-messages="errors.firstName"
-                          class="mb-3"/>
+            <v-text-field v-model="firstName" label="Nombres" variant="outlined" prepend-inner-icon="mdi-account":error-messages="errors.firstName"
+                          class="mb-3" data-cy="firstName"/>
 
             <v-text-field v-model="lastName" label="Apellidos" variant="outlined" :error-messages="errors.lastName"
-                          prepend-inner-icon="mdi-account-outline" class="mb-3"/>
+                          prepend-inner-icon="mdi-account-outline" class="mb-3" data-cy="lastName"/>
 
             <v-text-field v-model="email" label="Correo" type="email" variant="outlined" prepend-inner-icon="mdi-email" :error-messages="errors.email"
-                          class="mb-3"/>
+                          class="mb-3" data-cy="email"/>
 
             <v-text-field v-if="selectedRole === 'Estudiante'" v-model="carnet" label="Carnet" variant="outlined"
                           prepend-inner-icon="mdi-card-account-details" :error-messages="errors.carnet" class="mb-3" data-cy="carnet"/>
@@ -140,8 +140,8 @@ async function handleRegister() {
             <v-text-field v-model="password" label="Contraseña" variant="outlined" prepend-inner-icon="mdi-lock"
                           :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                           :type="showPassword ? 'text' : 'password'" 
-                            :error-messages="errors.password"
-                          @click:append="showPassword = !showPassword"/>
+                          :error-messages="errors.password"
+                          @click:append="showPassword = !showPassword" data-cy="password"/>
 
           </v-card-text>
 

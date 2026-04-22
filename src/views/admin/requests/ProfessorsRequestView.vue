@@ -143,7 +143,7 @@ onMounted(fetchRequests)
       <v-btn icon="mdi-refresh" color="primary" variant="tonal" @click="fetchRequests" :loading="loading"></v-btn>
     </div>
 
-    <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar docente por nombre o correo..."
+    <v-text-field data-cy="search-input" v-model="searchQuery" prepend-inner-icon="mdi-magnify" label="Buscar docente por nombre o correo..."
       variant="outlined" rounded="lg" class="mb-6 bg-white" hide-details clearable></v-text-field>
 
     <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4"></v-progress-linear>
@@ -160,8 +160,8 @@ onMounted(fetchRequests)
               {{ new Date(item.registrationDate).toLocaleDateString() }}
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-btn color="success" icon="mdi-check-circle" variant="text" @click="approveTeacher(item.id)"></v-btn>
-              <v-btn color="error" icon="mdi-close-circle" variant="text" @click="openRejectDialog(item)"></v-btn>
+              <v-btn data-cy="btn-aprobar" color="success" icon="mdi-check-circle" variant="text" @click="approveTeacher(item.id)"></v-btn>
+              <v-btn data-cy="btn-rechazar" color="error" icon="mdi-close-circle" variant="text" @click="openRejectDialog(item)"></v-btn>
             </template>
           </v-data-table>
         </v-card>
@@ -210,7 +210,7 @@ onMounted(fetchRequests)
         <v-card-title class="text-h6 font-weight-bold">Rechazar Solicitud</v-card-title>
         <v-card-text>
           <p class="mb-4">¿Rechazar a <b>{{ selectedRequest?.fullName }}</b>?</p>
-          <v-textarea v-model="rejectReason" label="Motivo del rechazo" variant="outlined" rows="3" color="error"
+          <v-textarea data-cy="reject-reason" v-model="rejectReason" label="Motivo del rechazo" variant="outlined" rows="3" color="error"
             auto-grow prepend-inner-icon="mdi-comment-text-outline"></v-textarea>
         </v-card-text>
         <v-card-actions>

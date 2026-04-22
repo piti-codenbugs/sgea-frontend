@@ -96,6 +96,7 @@ const handleSubmit = async () => {
             readonly
             disabled
             class="mb-2"
+            data-cy="email"
           ></v-text-field>
 
           <v-text-field
@@ -105,6 +106,7 @@ const handleSubmit = async () => {
             variant="outlined"
             :rules="[rules.required]"
             class="mb-2"
+            data-cy="firstName"
           ></v-text-field>
 
           <v-text-field
@@ -114,6 +116,7 @@ const handleSubmit = async () => {
             variant="outlined"
             :rules="[rules.required]"
             class="mb-2"
+            data-cy="lastName"
           ></v-text-field>
 
           <v-divider class="my-4"></v-divider>
@@ -130,6 +133,7 @@ const handleSubmit = async () => {
             :type="showCurrentPassword ? 'text' : 'password'"
             variant="outlined"
             class="mb-2"
+            data-cy="currentPassword"
             @click:append-inner="showCurrentPassword = !showCurrentPassword"
         ></v-text-field>
 
@@ -142,6 +146,7 @@ const handleSubmit = async () => {
             variant="outlined"
             :rules="[rules.minPassword]"
             class="mb-2"
+            data-cy="password"
             @click:append-inner="showPassword = !showPassword"
           ></v-text-field>
 
@@ -154,6 +159,7 @@ const handleSubmit = async () => {
             variant="outlined"
             :rules="[rules.matchPassword]"
             class="mb-2"
+            data-cy="confirmPassword"
             @click:append-inner="showConfirmPassword = !showConfirmPassword"
           ></v-text-field>
 
@@ -189,6 +195,7 @@ const handleSubmit = async () => {
             :loading="loading"
             min-width="160"
             rounded="lg"
+            data-cy="saveButton"
             @click="handleSubmit"
           >
             Guardar cambios
